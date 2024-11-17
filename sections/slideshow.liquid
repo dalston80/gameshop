@@ -1,0 +1,128 @@
+<section id="gs-image-slider" class="gs-image-slider">
+    {% if section.blocks.size > 0 %}
+      <button class="btn slider-previous">
+          <i class="fas fa-chevron-left"></i>
+      </button>
+    {% endif %}
+    <ul class="slides" style="width: {{ section.blocks.size | times: 100 }}%; --slide-count: {{ section.blocks.size }}">
+      {% for block in section.blocks %}
+        <li data-slide-index="{{ forloop.index0 }}" class="slide" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url({{ block.settings.image | image_url }});">
+          <h1 class="slide-title text-white">{{ block.settings.heading }}</h1>
+          <h1 class="text-white text-bold pb-1">{{ block.settings.price }}</h1>
+          <a href="{{ block.settings.button_link }}" class="btn buy-now text-bold">{{ block.settings.button_label }}</a>
+        </li>
+      {% endfor %}
+        {% comment %} <li data-slide-index="0" class="slide" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url({{ 'final-fantasy-vii-remake-8k-2020-95-1920x1080.jpg' | asset_url }});">
+            <!-- <img src="/img/final-fantasy-vii-remake-8k-2020-95-1920x1080.jpg" /> -->
+            <h1 class="slide-title text-white">Final Fantasy VII Remake Intergrade <br/> Now available on PS5!</h1>
+            <h1 class="text-white text-bold pb-1">Only $49.99</h1>
+            <button class="btn buy-now text-bold">Buy Now</button>
+        </li>
+        <li data-slide-index="1" class="slide" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url({{ 'final-fantasy-vii-remake-8k-2020-95-1920x1080.jpg' | asset_url }});">
+          <!-- <img src="/img/final-fantasy-vii-remake-8k-2020-95-1920x1080.jpg" /> -->
+          <h1 class="slide-title text-white">Final Fantasy VII Remake Intergrade <br/> Now available on PS5!</h1>
+          <h1 class="text-white text-bold pb-1">Only $49.99</h1>
+          <button class="btn buy-now text-bold">Buy Now</button>
+        </li>
+        <li data-slide-index="2" class="slide" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url({{ 'final-fantasy-vii-remake-8k-2020-95-1920x1080.jpg' | asset_url }});">
+          <!-- <img src="/img/final-fantasy-vii-remake-8k-2020-95-1920x1080.jpg" /> -->
+          <h1 class="slide-title text-white">Final Fantasy VII Remake Intergrade <br/> Now available on PS5!</h1>
+          <h1 class="text-white text-bold pb-1">Only $49.99</h1>
+          <button class="btn buy-now text-bold">Buy Now</button>
+        </li> {% endcomment %}
+    </ul>
+    {% if section.blocks.size > 0 %}
+      <button class="btn slider-next">
+          <i class="fas fa-chevron-right"></i>
+      </button>
+    {% endif %}
+    {%  if section.blocks.size > 1 %}
+      <div class="slider-btns">
+        {% for block in section.blocks %}
+            <button class="btn btn-slider{% if forloop.first %} slide-active{% endif %}" data-slide-index="{{ forloop.index0 }}"><i></i></button>
+        {% endfor %}
+      </div>
+    {% endif %}
+</section>
+
+{% schema %}
+{
+  "name": "Slideshow",
+  "max_blocks": 5,
+  "settings": [
+    {
+      "type": "select",
+      "id": "transition_type",
+      "label": "Transition Effect",
+      "options": [
+        {
+          "value": "slide",
+          "label": "Slide"
+        },
+        {
+          "value": "fade", 
+          "label": "Fade"
+        }
+      ],
+      "default": "slide"
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "label": "Change slides every",
+      "min": 3,
+      "max": 9,
+      "step": 1,
+      "unit": "s",
+      "default": 5
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Slide heading"
+        },
+        {
+          "type": "text", 
+          "id": "price",
+          "label": "Price",
+          "default": "$49.99"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button Link"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button Label",
+          "default": "Buy Now"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Slideshow",
+      "category": "Image",
+      "blocks": [
+        {
+          "type": "slide"
+        }
+      ]
+    }
+  ]
+}
+{% endschema%}

@@ -1,0 +1,157 @@
+<header class="gs-store-header bg-primary {% if section.settings.enable_sticky_header %}sticky-header{% endif %}">
+    <form class="mobile-search-form bg-primary" action="/search" method="get">
+        <predictive-search>
+            <input type="search" name="q" placeholder="Search..." data-predictive-search-input>
+            <div class="predictive-search-results" data-predictive-search-results></div>
+            <button class="bg-secondary text-white m-1" type="submit">{% render 'icon_search' %}</button>
+        </predictive-search>
+    </form>
+    <div id="mobile-menu" class="mobile-menu bg-white">
+        <div class="mobile-menu-header">
+            <button class="btn btn-close" aria-label="Close Menu">
+                {% render 'icon_close' %}
+            </button>
+        </div>
+        <ul class="p-1" aria-hidden="true">
+            {% for link in linklists[section.settings.menu].links %}
+                <li {% if link.links != blank %}class="has-children"{% endif %}>
+                    <div class="mobile-menu-link">
+                        <a href="{{ link.url }}">{{ link.title }}</a> {% if link.links != blank %}<button class="btn-toggle-sub-menu" aria-label="Toggle Sub Menu">{% render 'icon_chevron' %}</button>{% endif %}
+                    </div>
+                    {% if link.links != blank %}
+                        {% if link.type == 'mega_menu' %}
+                            <div class="mega-menu" aria-hidden="true">
+                                {% render 'mega-menu', menu: link %}
+                            </div>
+                        {% else %}
+                            <ul class="sub-menu" aria-hidden="true">
+                                {% for child_link in link.links %}
+                                    <li {% if child_link.links != blank %}class="has-children"{% endif %}>
+                                        <div class="mobile-menu-link">
+                                            <a href="{{ child_link.url }}">{{ child_link.title }}</a> {% if child_link.links != blank %}<button class="btn-toggle-sub-menu" aria-label="Toggle Sub Menu">{% render 'icon_chevron' %}</button>{% endif %}
+                                        </div>
+                                        {% if child_link.links != blank %}
+                                            {% if child_link.type == 'mega_menu' %}
+                                                <div class="mega-menu" aria-hidden="true">
+                                                    {% render 'mega-menu', menu: child_link %}
+                                                </div>
+                                            {% else %}
+                                                <ul class="sub-menu" aria-hidden="true">
+                                                    {% for grandchild_link in child_link.links %}
+                                                        <li>
+                                                            <div class="mobile-menu-link">
+                                                                <a href="{{ grandchild_link.url }}">{{ grandchild_link.title }}</a>
+                                                            </div>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="container">
+        <div class="header-content">
+            <div class="left-side">
+                <nav role="navigation">
+                    <a class="menu-btn" href="#" aria-hidden="false">
+                        <span>{% render 'icon_hamburger' %}</span>
+                    </a>
+                </nav>
+                <div class="logo text-white">
+                    {% if section.settings.logo_image != blank %}
+                         <img src="{{section.settings.logo_image | image_url: 'master'}}" alt="{{section.settings.logo_text}}" width="100" height="100">
+                    {% else %}
+                         <span>{% if section.settings.logo_text != blank %}{{ section.settings.logo_text }}{% else %}GameShop{% endif %}</span>
+                    {% endif %}
+                </div>
+                <form class="search-form bg-primary" action="/search" method="get">
+                    <predictive-search>
+                        <div class="predictive-search-wrapper" data-predictive-search>
+                          <input
+                            type="search"
+                            name="q"
+                            placeholder="Search..."
+                            class="search-input"
+                            data-predictive-search-input
+                            aria-label="Search..."
+                            aria-autocomplete="list"
+                            aria-owns="predictive-search-results"
+                            aria-expanded="false"
+                            autocomplete="off"
+                          >
+                          <button type="submit" class="bg-secondary text-white m-1">
+                            {% render 'icon_search' %}
+                          </button>
+                          <div id="predictive-search-results" class="predictive-search-results" tabindex="-1" data-predictive-search-results></div>
+                        </div>
+                      </predictive-search>
+                </form>
+            </div>
+
+            <div class="right-side">
+                <div class="currency-select">
+                    {% form 'currency' %}
+                        <select name="currency">
+                          {% for currency in shop.enabled_currencies %}
+                            <option value="{{ currency.iso_code }}"{% if currency == cart.currency %} selected{% endif %}>
+                              {{ currency.iso_code }} {{ currency.symbol }}
+                            </option>
+                          {% endfor %}
+                        </select>
+                    {% endform %}
+                </div>
+                <div class="login-signup text-bold text-white">
+                    <a class="text-white" href="/account/login">Login</a> or <a href="/account/register"><span class="text-secondary">Sign Up</span></a>
+                </div>
+                <div class="cart-search">
+                    <button href="#" class="text-white search">{% render 'icon_search' %}</button>
+                    <a href="#" class="text-white cart">
+                        {% render 'icon_cart' %}
+                        <span class="cart-count bg-secondary">
+                            <span>0</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+{% schema %}
+  {
+    "name": "Header",
+    "settings": [
+        {
+            "type": "checkbox",
+            "id": "enable_sticky_header",
+            "label": "Enable sticky header",
+            "default": true
+        },
+        {
+            "type": "text",
+            "id": "logo_text",
+            "label": "Logo Text",
+            "default": "GameShop"
+        },
+        {
+            "type": "link_list",
+            "id": "menu",
+            "label": "Header Menu",
+            "default": "main-menu"
+        },
+        {
+            "type": "image_picker",
+            "id": "logo_image",
+            "label": "Logo Image"
+        }
+    ]
+  }
+{% endschema %}

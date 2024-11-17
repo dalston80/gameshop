@@ -1,0 +1,56 @@
+<nav id="gs-navigation" class="gs-navigation" role="navigation">
+    <div class="container main-nav-content">
+        <ul id="main-menu" class="main-menu">
+            {% for link in linklists[section.settings.menu].links %}
+                <li {% if link.links != blank %}class="has-children"{% endif %}>
+                    <a href="{{ link.url }}"><span>{{ link.title }}</span> {% if link.links != blank %}{% render 'icon_chevron' %}{% endif %}</a>
+                    {% if link.links != blank %}
+                        {% if link.type == 'mega_menu' %}
+                            <div class="mega-menu" aria-hidden="true">
+                                {% render 'mega-menu', menu: link %}
+                            </div>
+                        {% else %}
+                            <ul class="sub-menu" aria-hidden="true">
+                                {% for child_link in link.links %}
+                                    <li {% if child_link.links != blank %}class="has-children"{% endif %}>
+                                        <a href="{{ child_link.url }}">{{ child_link.title }} {% if child_link.links != blank %}{% render 'icon_chevron' %}{% endif %}</a>
+                                        {% if child_link.links != blank %}
+                                            {% if child_link.type == 'mega_menu' %}
+                                                <div class="mega-menu" aria-hidden="true">
+                                                    {% render 'mega-menu', menu: child_link %}
+                                                </div>
+                                            {% else %}
+                                                <ul class="sub-menu" aria-hidden="true">
+                                                    {% for grandchild_link in child_link.links %}
+                                                        <li>
+                                                            <a href="{{ grandchild_link.url }}">{{ grandchild_link.title }}</a>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        {% endif %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        {% comment %} <span class="free-shipping-message">Free shipping on orders over $50!</span> {% endcomment %}
+    </div>
+</nav>
+
+{% schema %}
+    {
+        "name": "Navigation",
+        "settings": [
+            {
+                "type": "link_list",
+                "id": "menu",
+                "label": "Menu",
+                "default": "main-menu"
+            }
+        ]
+    }
+{% endschema %} 

@@ -1,0 +1,23 @@
+<div id="predictive-search">
+    {% if search.performed %}
+      {% if search.results_count > 0 %}
+        <ul>
+          {% for product in search.results limit: 4 %}
+            <li>
+              <a href="{{ product.url }}">
+                {% if product.featured_image %}
+                  <img src="{{ product.featured_image | image_url: '100x100' }}" alt="{{ product.featured_image.alt }}" width="100" height="100">
+                {% endif %}
+                {{ product.title }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+        {% if search.results_count > 4 %}
+          <a href="{{ routes.search_url }}?q={{ search.terms }}&options[prefix]=last">View all results ({{ search.results_count }})</a>
+        {% endif %}
+      {% else %}
+        <p>No results found for "{{ search.terms }}"</p>
+      {% endif %}
+    {% endif %}
+  </div>
