@@ -1,5 +1,5 @@
 <section id="gs-image-slider" class="gs-image-slider">
-    {% if section.blocks.size > 0 %}
+    {% if section.blocks.size > 1 %}
       <button class="btn slider-previous">
           <i class="fas fa-chevron-left"></i>
       </button>
@@ -12,26 +12,8 @@
           <a href="{{ block.settings.button_link }}" class="btn buy-now text-bold">{{ block.settings.button_label }}</a>
         </li>
       {% endfor %}
-        {% comment %} <li data-slide-index="0" class="slide" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url({{ 'final-fantasy-vii-remake-8k-2020-95-1920x1080.jpg' | asset_url }});">
-            <!-- <img src="/img/final-fantasy-vii-remake-8k-2020-95-1920x1080.jpg" /> -->
-            <h1 class="slide-title text-white">Final Fantasy VII Remake Intergrade <br/> Now available on PS5!</h1>
-            <h1 class="text-white text-bold pb-1">Only $49.99</h1>
-            <button class="btn buy-now text-bold">Buy Now</button>
-        </li>
-        <li data-slide-index="1" class="slide" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url({{ 'final-fantasy-vii-remake-8k-2020-95-1920x1080.jpg' | asset_url }});">
-          <!-- <img src="/img/final-fantasy-vii-remake-8k-2020-95-1920x1080.jpg" /> -->
-          <h1 class="slide-title text-white">Final Fantasy VII Remake Intergrade <br/> Now available on PS5!</h1>
-          <h1 class="text-white text-bold pb-1">Only $49.99</h1>
-          <button class="btn buy-now text-bold">Buy Now</button>
-        </li>
-        <li data-slide-index="2" class="slide" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url({{ 'final-fantasy-vii-remake-8k-2020-95-1920x1080.jpg' | asset_url }});">
-          <!-- <img src="/img/final-fantasy-vii-remake-8k-2020-95-1920x1080.jpg" /> -->
-          <h1 class="slide-title text-white">Final Fantasy VII Remake Intergrade <br/> Now available on PS5!</h1>
-          <h1 class="text-white text-bold pb-1">Only $49.99</h1>
-          <button class="btn buy-now text-bold">Buy Now</button>
-        </li> {% endcomment %}
     </ul>
-    {% if section.blocks.size > 0 %}
+    {% if section.blocks.size > 1 %}
       <button class="btn slider-next">
           <i class="fas fa-chevron-right"></i>
       </button>

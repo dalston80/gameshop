@@ -1535,6 +1535,65 @@
     color: hsl(var(--gs-white), 1);
     background-color: hsl(var(--gs-secondary), 1);
   }
+
+  .main-content .gs-hero {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    padding: 4rem 0;
+  }
+  
+  .main-content .gs-hero .hero-content {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+  
+  .main-content .gs-hero .flex-reverse {
+    flex-direction: row-reverse;
+  }
+  
+  .main-content .gs-hero .hero-text,
+  .main-content .gs-hero .hero-image {
+    flex: 1;
+  }
+  
+  .main-content .gs-hero .hero-heading {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .main-content .gs-hero .hero-subheading {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .main-content .gs-hero .hero-cta {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background-color: var(--color-secondary);
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .main-content .gs-hero .hero-image img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  @media (max-width: 48rem) {
+    .main-content .gs-hero .hero-content {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .main-content .gs-hero .flex-reverse {
+      flex-direction: column;
+    }
+  }
   
   .main-content .gs-newsletter .container {
     display: -webkit-box;

@@ -1,0 +1,105 @@
+<section class="gs-hero {% if section.settings.background_color != blank %}bg-{{ section.settings.background_color }}{% endif %}" 
+    {% if section.settings.background_image != blank %}
+      style="background-image: url({{ section.settings.background_image | image_url: 'master' }});"
+    {% endif %}>
+    <div class="container">
+      <div class="hero-content {% if section.settings.swap_columns %}flex-reverse{% endif %}">
+        <div class="hero-text">
+          {% if section.settings.heading != blank %}
+            <h1 class="hero-heading">{{ section.settings.heading }}</h1>
+          {% endif %}
+          
+          {% if section.settings.subheading != blank %}
+            <div class="hero-subheading">{{ section.settings.subheading }}</div>
+          {% endif %}
+          
+          {% if section.settings.button_link != blank %}
+            <a href="{{ section.settings.button_link }}" class="btn hero-cta">
+              {{ section.settings.button_label | default: 'Learn More' }}
+            </a>
+          {% endif %}
+        </div>
+        
+        <div class="hero-image">
+          {% if section.settings.image != blank %}
+            <img src="{{ section.settings.image | image_url: 'master' }}" 
+                 alt="{{ section.settings.image.alt | default: section.settings.heading }}"
+                 loading="eager"
+                 width="{{ section.settings.image.width }}"
+                 height="{{ section.settings.image.height }}">
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  {% schema %}
+  {
+    "name": "Hero",
+    "settings": [
+      {
+        "type": "text",
+        "id": "heading",
+        "label": "Heading",
+        "default": "Welcome to GameShop"
+      },
+      {
+        "type": "richtext",
+        "id": "subheading",
+        "label": "Subheading"
+      },
+      {
+        "type": "url",
+        "id": "button_link",
+        "label": "Button Link"
+      },
+      {
+        "type": "text",
+        "id": "button_label",
+        "label": "Button Label",
+        "default": "Shop Now"
+      },
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "Hero Image"
+      },
+      {
+        "type": "image_picker",
+        "id": "background_image",
+        "label": "Background Image"
+      },
+      {
+        "type": "select",
+        "id": "background_color",
+        "label": "Background Color",
+        "options": [
+          {
+            "value": "primary",
+            "label": "Primary"
+          },
+          {
+            "value": "secondary",
+            "label": "Secondary"
+          },
+          {
+            "value": "white",
+            "label": "White"
+          }
+        ]
+      },
+      {
+        "type": "checkbox",
+        "id": "swap_columns",
+        "label": "Swap column positions",
+        "default": false
+      }
+    ],
+    "presets": [
+      {
+        "name": "Hero",
+        "category": "Hero Sections"
+      }
+    ]
+  }
+  {% endschema %}
