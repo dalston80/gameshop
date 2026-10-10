@@ -11,11 +11,36 @@
   "sections": {
     "hero": {
       "type": "hero",
-      "settings": {}
+      "settings": {
+        "heading": "Welcome to GameShop",
+        "subheading": "",
+        "button_link": "",
+        "button_label": "Shop Now",
+        "background_color": "primary",
+        "swap_columns": false
+      }
     },
     "slideshow": {
       "type": "slideshow",
-      "settings": {}
+      "blocks": {
+        "slide_kWVm97": {
+          "type": "slide",
+          "settings": {
+            "image": "shopify://shop_images/final-fantasy-vii-remake-8k-2020-95-1920x1080.jpg",
+            "heading": "Slide heading",
+            "price": "$49.99",
+            "button_link": "",
+            "button_label": "Buy Now"
+          }
+        }
+      },
+      "block_order": [
+        "slide_kWVm97"
+      ],
+      "settings": {
+        "transition_type": "slide",
+        "autoplay_speed": 5
+      }
     }
   },
   "order": [
