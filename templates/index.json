@@ -35,6 +35,16 @@
         "autoplay_speed": 5
       }
     },
+    "newsletter_q9qRew": {
+      "type": "newsletter",
+      "name": "t:sections.newsletter.presets.name",
+      "settings": {
+        "heading": "Join our newsletter!",
+        "text": "Be the first to know about new releases, discounts and more.",
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    },
     "collection_tiles_LbjbNe": {
       "type": "collection-tiles",
       "blocks": {
@@ -82,6 +92,7 @@
   },
   "order": [
     "slideshow",
+    "newsletter_q9qRew",
     "collection_tiles_LbjbNe"
   ]
 }
