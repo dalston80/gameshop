@@ -1,11 +1,33 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
       "type": "main-product",
       "blocks": {
-        "title": { "type": "title" },
-        "price": { "type": "price", "settings": { "show_tax_note": true } },
-        "variant_picker": { "type": "variant_picker", "settings": { "picker_type": "buttons" } },
+        "title": {
+          "type": "title",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_tax_note": true
+          }
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "buttons"
+          }
+        },
         "buy_buttons": {
           "type": "buy_buttons",
           "settings": {
@@ -15,9 +37,18 @@
             "show_pickup": false
           }
         },
-        "share": { "type": "share" }
+        "share": {
+          "type": "share",
+          "settings": {}
+        }
       },
-      "block_order": ["title", "price", "variant_picker", "buy_buttons", "share"],
+      "block_order": [
+        "title",
+        "price",
+        "variant_picker",
+        "buy_buttons",
+        "share"
+      ],
       "settings": {
         "media_ratio": "landscape",
         "image_fit": "contain",
@@ -41,5 +72,8 @@
       }
     }
   },
-  "order": ["main", "recently-viewed"]
+  "order": [
+    "main",
+    "recently-viewed"
+  ]
 }

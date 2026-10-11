@@ -1,15 +1,51 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
       "type": "main-product",
       "blocks": {
-        "platform": { "type": "platform" },
-        "title": { "type": "title" },
-        "vendor": { "type": "vendor" },
-        "rating": { "type": "rating" },
-        "price": { "type": "price", "settings": { "show_tax_note": true } },
-        "inventory": { "type": "inventory", "settings": { "low_stock_threshold": 5 } },
-        "variant_picker": { "type": "variant_picker", "settings": { "picker_type": "buttons" } },
+        "platform": {
+          "type": "platform",
+          "settings": {}
+        },
+        "title": {
+          "type": "title",
+          "settings": {}
+        },
+        "vendor": {
+          "type": "vendor",
+          "settings": {}
+        },
+        "rating": {
+          "type": "rating",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {
+            "show_tax_note": true
+          }
+        },
+        "inventory": {
+          "type": "inventory",
+          "settings": {
+            "low_stock_threshold": 5
+          }
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "buttons"
+          }
+        },
         "buy_buttons": {
           "type": "buy_buttons",
           "settings": {
@@ -19,7 +55,10 @@
             "show_pickup": true
           }
         },
-        "share": { "type": "share" },
+        "share": {
+          "type": "share",
+          "settings": {}
+        },
         "shipping": {
           "type": "collapsible_tab",
           "settings": {
@@ -27,7 +66,12 @@
             "content": "<p>Add delivery times and return policy details here so shoppers know what to expect before they buy.</p>"
           }
         },
-        "specifications": { "type": "specifications", "settings": { "label": "Specifications" } }
+        "specifications": {
+          "type": "specifications",
+          "settings": {
+            "label": "Specifications"
+          }
+        }
       },
       "block_order": [
         "platform",
@@ -87,5 +131,10 @@
       }
     }
   },
-  "order": ["main", "complementary", "related", "recently-viewed"]
+  "order": [
+    "main",
+    "complementary",
+    "related",
+    "recently-viewed"
+  ]
 }
