@@ -1,0 +1,130 @@
+<div
+  class="main-contact section page-width"
+  style="--section-padding-top: {{ section.settings.padding_top }}px; --section-padding-bottom: {{ section.settings.padding_bottom }}px;"
+>
+  <h1 class="main-contact__title">{{ page.title | escape }}</h1>
+
+  {%- if page.content != blank -%}
+    <div class="main-contact__content rte">
+      {{ page.content }}
+    </div>
+  {%- endif -%}
+
+  {%- form 'contact', id: 'contact-form', class: 'main-contact__form' -%}
+    {%- if form.posted_successfully? -%}
+      <p class="form-message form-message--success" role="status" tabindex="-1" autofocus>
+        {{ 'contact.form.success' | t }}
+      </p>
+    {%- endif -%}
+
+    {%- if form.errors -%}
+      <div class="form-message form-message--error" role="alert" tabindex="-1" autofocus>
+        <p>{{ 'contact.form.error_heading' | t }}</p>
+        {{ form.errors | default_errors }}
+      </div>
+    {%- endif -%}
+
+    <div class="main-contact__row">
+      <div class="field">
+        <label for="contact-name">{{ 'contact.form.name' | t }}</label>
+        <input
+          id="contact-name"
+          type="text"
+          name="contact[name]"
+          value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+          autocomplete="name"
+        >
+      </div>
+      <div class="field">
+        <label for="contact-email">{{ 'contact.form.email' | t }}</label>
+        <input
+          id="contact-email"
+          type="email"
+          name="contact[email]"
+          value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+          autocomplete="email"
+          required
+          {% if form.errors contains 'email' %}aria-invalid="true"{% endif %}
+        >
+      </div>
+    </div>
+
+    {%- if section.settings.show_phone -%}
+      <div class="field">
+        <label for="contact-phone">{{ 'contact.form.phone' | t }}</label>
+        <input
+          id="contact-phone"
+          type="tel"
+          name="contact[phone]"
+          value="{{ form.phone }}"
+          autocomplete="tel"
+        >
+      </div>
+    {%- endif -%}
+
+    <div class="field">
+      <label for="contact-body">{{ 'contact.form.message' | t }}</label>
+      <textarea
+        id="contact-body"
+        name="contact[body]"
+        rows="6"
+        required
+        {% if form.errors contains 'body' %}aria-invalid="true"{% endif %}
+      >{{ form.body }}</textarea>
+    </div>
+
+    <button type="submit" class="button">{{ 'contact.form.submit' | t }}</button>
+  {%- endform -%}
+</div>
+
+{% stylesheet %}
+  .main-contact {
+    max-width: calc(44rem + var(--page-margin) * 2);
+  }
+
+  .main-contact__form {
+    margin-top: 2rem;
+  }
+
+  @media (min-width: 750px) {
+    .main-contact__row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.main_contact.name",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_phone",
+      "label": "t:sections.main_contact.settings.show_phone",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding_top",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding_bottom",
+      "default": 32
+    }
+  ]
+}
+{% endschema %}

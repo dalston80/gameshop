@@ -1,0 +1,177 @@
+{%- assign items = section.blocks | where: 'type', 'category' -%}
+
+{%- if items.size > 0 -%}
+  <div
+    class="section collection-icons"
+    style="--section-padding-top: {{ section.settings.padding_top }}px; --section-padding-bottom: {{ section.settings.padding_bottom }}px;"
+  >
+    <div class="page-width">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="section-heading">{{ section.settings.heading | escape }}</h2>
+      {%- endif -%}
+
+      <ul class="collection-icons__list" role="list">
+        {%- for block in items -%}
+          {%- liquid
+            assign collection = block.settings.collection
+            assign image = block.settings.image
+            if image == blank
+              assign image = collection.featured_image
+            endif
+            assign label = block.settings.label
+            if label == blank
+              assign label = collection.title
+            endif
+          -%}
+          {%- if collection != blank or request.design_mode -%}
+            <li class="collection-icons__item" {{ block.shopify_attributes }}>
+              <a class="collection-icons__link" {% if collection != blank %}href="{{ collection.url }}"{% endif %}>
+                <span class="collection-icons__image media">
+                  {%- if image != blank -%}
+                    {{
+                      image
+                      | image_url: width: 400
+                      | image_tag:
+                        widths: '150, 200, 300, 400',
+                        sizes: '(min-width: 990px) 200px, 45vw',
+                        loading: 'lazy',
+                        alt: ''
+                    }}
+                  {%- elsif request.design_mode -%}
+                    {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                  {%- endif -%}
+                </span>
+                <span class="collection-icons__label">
+                  {%- if label != blank -%}
+                    {{- label | escape -}}
+                  {%- else -%}
+                    {{- 'sections.collection_icons.choose' | t -}}
+                  {%- endif -%}
+                </span>
+              </a>
+            </li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+{%- elsif request.design_mode -%}
+  <div class="page-width section">
+    <div class="empty-state">
+      <p>{{ 'sections.collection_icons.empty' | t }}</p>
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .collection-icons__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .collection-icons__link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    color: var(--color-text);
+    font-weight: var(--font-body-weight-bold);
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .collection-icons__link:hover .collection-icons__label {
+    color: var(--color-accent-text);
+    text-decoration: underline;
+  }
+
+  .collection-icons__image {
+    display: block;
+    aspect-ratio: 1;
+    border-radius: var(--radius);
+  }
+
+  @media (min-width: 750px) {
+    .collection-icons__list {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.collection_icons.name",
+  "tag": "section",
+  "class": "section-collection-icons",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:sections.collection_icons.settings.heading.label",
+      "default": "Popular categories"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "t:sections.marketing.padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "t:sections.marketing.padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "t:sections.collection_icons.blocks.category.name",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "t:sections.collection_icons.blocks.category.settings.collection.label"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "t:sections.collection_icons.blocks.category.settings.label.label",
+          "info": "t:sections.collection_icons.blocks.category.settings.label.info"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "t:sections.collection_icons.blocks.category.settings.image.label",
+          "info": "t:sections.collection_icons.blocks.category.settings.image.info"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 10,
+  "presets": [
+    {
+      "name": "t:sections.collection_icons.presets.name",
+      "blocks": [
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" },
+        { "type": "category" }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,349 @@
+{% doc %}
+  Renders the merchant-ordered product blocks shared by the main product and featured product sections.
+  Pass `area: 'info'` for the blocks before the "Reviews area" marker block, or `area: 'reviews'`
+  for the blocks after it. Regions marked `data-update` are re-rendered by <product-form> on variant change.
+
+  @param {product} product - The product
+  @param {variant} variant - The currently selected variant
+  @param {object} blocks - The section's blocks (`section.blocks`)
+  @param {string} section_id - The id of the section
+  @param {string} [area] - 'info' (default) or 'reviews'
+  @param {string} [heading_tag] - Tag used by the title block (`h1` on the product page, `h2` elsewhere)
+  @param {boolean} [link_title] - Link the title to the product page
+  @param {boolean} [has_reviews_area] - Whether an app block exists in the reviews area (links the rating to it)
+
+  @example
+  {% render 'product-blocks', product: product, variant: current_variant, blocks: section.blocks, section_id: section.id, heading_tag: 'h1' %}
+{% enddoc %}
+
+{%- liquid
+  assign area = area | default: 'info'
+  assign heading_tag = heading_tag | default: 'h2'
+  assign reached_marker = false
+-%}
+
+{%- for block in blocks -%}
+  {%- if block.type == 'app_reviews_marker' -%}
+    {%- assign reached_marker = true -%}
+    {%- continue -%}
+  {%- endif -%}
+  {%- if area == 'info' and reached_marker -%}
+    {%- break -%}
+  {%- endif -%}
+  {%- if area == 'reviews' and reached_marker == false -%}
+    {%- continue -%}
+  {%- endif -%}
+
+  {%- case block.type -%}
+    {%- when '@app' -%}
+      {% render block %}
+
+    {%- when 'title' -%}
+      <{{ heading_tag }} class="product-block product-block--title" {{ block.shopify_attributes }}>
+        {%- if link_title -%}
+          <a href="{{ product.url }}">{{ product.title }}</a>
+        {%- else -%}
+          {{ product.title }}
+        {%- endif -%}
+      </{{ heading_tag }}>
+
+    {%- when 'vendor' -%}
+      {%- if product.vendor != blank -%}
+        <p class="product-block product-block--vendor" {{ block.shopify_attributes }}>
+          <a href="{{ product.vendor | url_for_vendor }}">{{ product.vendor }}</a>
+        </p>
+      {%- endif -%}
+
+    {%- when 'platform' -%}
+      {%- capture platform_badge -%}
+        {% render 'platform-badge', tags: product.tags %}
+      {%- endcapture -%}
+      {%- if platform_badge != blank -%}
+        <div class="product-block product-block--platform" {{ block.shopify_attributes }}>
+          {{ platform_badge }}
+        </div>
+      {%- endif -%}
+
+    {%- when 'rating' -%}
+      {%- capture rating_html -%}
+        {% render 'rating', product: product %}
+      {%- endcapture -%}
+      {%- if rating_html != blank -%}
+        <div class="product-block product-block--rating" {{ block.shopify_attributes }}>
+          {%- if has_reviews_area -%}
+            <a class="product-block__rating-link" href="#reviews">{{ rating_html }}</a>
+          {%- else -%}
+            {{ rating_html }}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+    {%- when 'price' -%}
+      <div class="product-block product-block--price" {{ block.shopify_attributes }}>
+        <div data-update="price-{{ block.id }}">
+          {% render 'price', product: product, variant: variant, class: 'product-block__price' %}
+          {%- if block.settings.show_tax_note -%}
+            <p class="product-block__note">
+              {%- if cart.taxes_included -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                  {{ 'cart.general.taxes_included_shipping_at_checkout_with_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- else -%}
+                  {{ 'cart.general.taxes_included_shipping_at_checkout' | t }}
+                {%- endif -%}
+              {%- else -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                  {{ 'cart.general.taxes_shipping_at_checkout_with_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- else -%}
+                  {{ 'cart.general.taxes_shipping_at_checkout' | t }}
+                {%- endif -%}
+              {%- endif -%}
+            </p>
+          {%- endif -%}
+        </div>
+      </div>
+
+    {%- when 'sku' -%}
+      <div class="product-block product-block--sku" data-update="sku-{{ block.id }}" {{ block.shopify_attributes }}>
+        {%- if variant.sku != blank -%}
+          {{ 'products.product.sku' | t }}: {{ variant.sku }}
+        {%- endif -%}
+      </div>
+
+    {%- when 'inventory' -%}
+      {%- liquid
+        assign threshold = block.settings.low_stock_threshold
+        assign inventory_state = 'in_stock'
+        if variant.available == false
+          assign inventory_state = 'sold_out'
+        elsif variant.inventory_management == 'shopify' and threshold > 0 and variant.inventory_quantity > 0 and variant.inventory_quantity <= threshold
+          assign inventory_state = 'low'
+        endif
+      -%}
+      <div class="product-block product-block--inventory" data-update="inventory-{{ block.id }}" {{ block.shopify_attributes }}>
+        <p class="product-block__inventory product-block__inventory--{{ inventory_state }}">
+          <span class="product-block__inventory-dot" aria-hidden="true"></span>
+          {%- if inventory_state == 'sold_out' -%}
+            {{ 'products.inventory.sold_out' | t }}
+          {%- elsif inventory_state == 'low' -%}
+            {{ 'products.inventory.low_stock' | t: count: variant.inventory_quantity }}
+          {%- else -%}
+            {{ 'products.inventory.in_stock' | t }}
+          {%- endif -%}
+        </p>
+      </div>
+
+    {%- when 'variant_picker' -%}
+      {%- unless product.has_only_default_variant -%}
+        <div class="product-block product-block--variant-picker" data-update="variant-picker-{{ block.id }}" {{ block.shopify_attributes }}>
+          {% render 'variant-picker', product: product, section_id: section_id, picker_type: block.settings.picker_type %}
+        </div>
+      {%- endunless -%}
+
+    {%- when 'buy_buttons' -%}
+      <div class="product-block product-block--buy-buttons" {{ block.shopify_attributes }}>
+        {% render 'buy-buttons',
+          product: product,
+          variant: variant,
+          section_id: section_id,
+          show_quantity: block.settings.show_quantity,
+          show_payment_button: block.settings.show_payment_button,
+          show_installments: block.settings.show_installments,
+          show_pickup: block.settings.show_pickup
+        %}
+      </div>
+
+    {%- when 'description' -%}
+      {%- if product.description != blank -%}
+        <div class="product-block product-block--description rte" {{ block.shopify_attributes }}>
+          {%- if block.settings.truncate_words > 0 -%}
+            <p>{{ product.description | strip_html | truncatewords: block.settings.truncate_words }}</p>
+          {%- else -%}
+            {{ product.description }}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+    {%- when 'share' -%}
+      <share-button
+        class="product-block product-block--share"
+        data-url="{{ canonical_url }}"
+        data-title="{{ product.title | escape }}"
+        data-copied="{{ 'products.share.copied' | t | escape }}"
+        hidden
+        {{ block.shopify_attributes }}
+      >
+        <span class="product-block__share-label">{{ 'products.share.label' | t }}</span>
+        <button type="button" class="button button--secondary button--small" data-share-copy hidden>
+          {{ 'products.share.copy_link' | t }}
+        </button>
+        <button type="button" class="button button--secondary button--small" data-share-native hidden>
+          {{ 'products.share.share' | t }}
+        </button>
+        <span class="product-block__share-status" role="status" data-share-status></span>
+      </share-button>
+
+    {%- when 'collapsible_tab' -%}
+      {%- liquid
+        assign tab_content = block.settings.content
+        if block.settings.page != blank
+          assign tab_content = block.settings.page.content
+        endif
+      -%}
+      {%- if block.settings.heading != blank -%}
+        <details class="product-block product-block--collapsible" {{ block.shopify_attributes }}>
+          <summary class="product-block__summary">
+            <span>{{ block.settings.heading }}</span>
+            {% render 'icon', name: 'chevron-down', class: 'product-block__summary-icon' %}
+          </summary>
+          <div class="product-block__panel rte">{{ tab_content }}</div>
+        </details>
+      {%- endif -%}
+
+    {%- when 'text' -%}
+      {%- if block.settings.text != blank -%}
+        <div class="product-block product-block--text rte" {{ block.shopify_attributes }}>
+          {{ block.settings.text }}
+        </div>
+      {%- endif -%}
+
+    {%- when 'custom_liquid' -%}
+      <div class="product-block product-block--custom-liquid" {{ block.shopify_attributes }}>
+        {{ block.settings.custom_liquid }}
+      </div>
+  {%- endcase -%}
+{%- endfor -%}
+
+{% stylesheet %}
+  .product-block {
+    margin: 0;
+  }
+
+  .product-block + .product-block,
+  .product-block + [data-update],
+  [data-update] + .product-block {
+    margin-top: 1rem;
+  }
+
+  .product-block--title {
+    font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.5rem);
+    overflow-wrap: anywhere;
+  }
+
+  .product-block--title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .product-block--title a:hover {
+    text-decoration: underline;
+  }
+
+  .product-block--vendor a {
+    color: var(--color-primary);
+    font-weight: var(--font-body-weight-bold);
+  }
+
+  .product-block__rating-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .product-block__rating-link:hover {
+    text-decoration: underline;
+  }
+
+  .product-block__price .price__current {
+    font-size: 1.75rem;
+  }
+
+  .product-block__note {
+    margin: 0.25rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+  }
+
+  .product-block--sku {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .product-block__inventory {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .product-block__inventory-dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+    background: var(--color-accent-text);
+  }
+
+  .product-block__inventory--low .product-block__inventory-dot {
+    background: var(--color-rating);
+  }
+
+  .product-block__inventory--sold_out .product-block__inventory-dot {
+    background: var(--color-sale);
+  }
+
+  .product-block--share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .product-block--share[hidden] {
+    display: none;
+  }
+
+  .product-block__share-label {
+    font-weight: var(--font-body-weight-bold);
+  }
+
+  .product-block__share-status {
+    color: var(--color-accent-text);
+    font-size: 0.875rem;
+  }
+
+  .product-block--collapsible {
+    border-block: 1px solid var(--color-border);
+  }
+
+  .product-block--collapsible + .product-block--collapsible {
+    margin-top: 0;
+    border-top: 0;
+  }
+
+  .product-block__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0;
+    font-weight: var(--font-body-weight-bold);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .product-block__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .product-block__summary-icon {
+    transition: transform 0.2s;
+  }
+
+  details[open] > .product-block__summary .product-block__summary-icon {
+    transform: rotate(180deg);
+  }
+
+  .product-block__panel {
+    padding-bottom: 1rem;
+  }
+{% endstylesheet %}

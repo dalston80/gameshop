@@ -1,0 +1,409 @@
+{% doc %}
+  Renders faceted filtering for a collection or search results page.
+
+  With `part: 'filters'` (default) it outputs the filter form: one accordion per filter (list, boolean,
+  swatch and price range). The form is a plain GET form, so it works without JavaScript through the Apply
+  button; facets.js upgrades it to update results in place.
+  With `part: 'active'` it outputs the active filter chips with remove links and a Clear all link.
+
+  @param {object} results - The `collection` or `search` object (must expose `filters`)
+  @param {string} url - The URL the form submits to (collection.url or routes.search_url)
+  @param {string} id - Unique id prefix for this instance (ids must differ between the sidebar and drawer copies)
+  @param {string} [part] - 'filters' (default) or 'active'
+
+  @example
+  {% render 'facets', results: collection, url: collection.url, id: 'sidebar' %}
+  {% render 'facets', results: collection, url: collection.url, id: 'active', part: 'active' %}
+{% enddoc %}
+
+{%- liquid
+  assign part = part | default: 'filters'
+  assign current_sort = results.sort_by
+
+  assign active_count = 0
+  for filter in results.filters
+    if filter.type == 'price_range'
+      if filter.min_value.value != blank or filter.max_value.value != blank
+        assign active_count = active_count | plus: 1
+      endif
+    else
+      assign active_count = active_count | plus: filter.active_values.size
+    endif
+  endfor
+
+  assign clear_url = url
+  assign clear_joiner = '?'
+  if search.performed
+    assign encoded_terms = search.terms | url_encode
+    assign clear_url = url | append: '?q=' | append: encoded_terms
+    assign clear_joiner = '&'
+  endif
+  if current_sort != blank
+    assign encoded_sort = current_sort | url_encode
+    assign clear_url = clear_url | append: clear_joiner | append: 'sort_by=' | append: encoded_sort
+  endif
+-%}
+
+{%- if part == 'active' -%}
+  {%- if active_count > 0 -%}
+    <div class="facets-active" data-facets-links>
+      <h2 class="visually-hidden">{{ 'facets.active_filters' | t }}</h2>
+      <ul class="facets-active__list">
+        {%- for filter in results.filters -%}
+          {%- if filter.type == 'price_range' -%}
+            {%- if filter.min_value.value != blank or filter.max_value.value != blank -%}
+              {%- liquid
+                assign min_money = filter.min_value.value | money_without_trailing_zeros
+                assign max_money = filter.max_value.value | money_without_trailing_zeros
+                if filter.min_value.value != blank and filter.max_value.value != blank
+                  assign price_label = 'facets.price_range' | t: min: min_money, max: max_money
+                elsif filter.min_value.value != blank
+                  assign price_label = 'facets.price_min_only' | t: min: min_money
+                else
+                  assign price_label = 'facets.price_max_only' | t: max: max_money
+                endif
+                assign chip_label = filter.label | append: ': ' | append: price_label
+              -%}
+              <li>
+                <a class="facets-chip" href="{{ filter.url_to_remove }}" data-facets-link>
+                  <span aria-hidden="true">{{ chip_label }}</span>
+                  <span class="visually-hidden">{{ 'facets.remove_filter' | t: label: chip_label }}</span>
+                  {% render 'icon', name: 'close', class: 'icon--small' %}
+                </a>
+              </li>
+            {%- endif -%}
+          {%- else -%}
+            {%- for value in filter.active_values -%}
+              {%- assign chip_label = filter.label | append: ': ' | append: value.label -%}
+              <li>
+                <a class="facets-chip" href="{{ value.url_to_remove }}" data-facets-link>
+                  <span aria-hidden="true">{{ chip_label }}</span>
+                  <span class="visually-hidden">{{ 'facets.remove_filter' | t: label: chip_label }}</span>
+                  {% render 'icon', name: 'close', class: 'icon--small' %}
+                </a>
+              </li>
+            {%- endfor -%}
+          {%- endif -%}
+        {%- endfor -%}
+        <li>
+          <a class="facets-active__clear" href="{{ clear_url }}" data-facets-link>{{ 'facets.clear_all' | t }}</a>
+        </li>
+      </ul>
+    </div>
+  {%- endif -%}
+{%- else -%}
+  <form class="facets" id="facets-{{ id }}" action="{{ url }}" method="get" data-facets-form>
+    {%- if search.performed -%}
+      <input type="hidden" name="q" value="{{ search.terms | escape }}">
+    {%- endif -%}
+    {%- if current_sort != blank -%}
+      <input type="hidden" name="sort_by" value="{{ current_sort }}">
+    {%- endif -%}
+
+    {%- if active_count > 0 -%}
+      <a class="facets__clear" href="{{ clear_url }}" data-facets-link>{{ 'facets.clear_all' | t }}</a>
+    {%- endif -%}
+
+    {%- for filter in results.filters -%}
+      {%- liquid
+        assign filter_key = id | append: '-' | append: forloop.index
+        assign group_active_count = filter.active_values.size
+        assign is_open = false
+        if forloop.first or group_active_count > 0
+          assign is_open = true
+        endif
+        if filter.type == 'price_range'
+          assign group_active_count = 0
+          if filter.min_value.value != blank or filter.max_value.value != blank
+            assign group_active_count = 1
+            assign is_open = true
+          endif
+        endif
+      -%}
+      <details class="facets__group" data-facet-id="{{ filter.param_name }}"{% if is_open %} open{% endif %}>
+        <summary class="facets__summary">
+          <span class="facets__summary-label">
+            {{- filter.label -}}
+            {%- if group_active_count > 0 -%}
+              <span class="facets__summary-count">({{ group_active_count }})</span>
+            {%- endif -%}
+          </span>
+          <span class="facets__summary-icon facets__summary-icon--plus">{% render 'icon', name: 'plus', class: 'icon--small' %}</span>
+          <span class="facets__summary-icon facets__summary-icon--minus">{% render 'icon', name: 'minus', class: 'icon--small' %}</span>
+        </summary>
+
+        <div class="facets__content">
+          {%- if filter.type == 'price_range' -%}
+            <div class="facets__price">
+              <div class="facets__price-field">
+                <label for="{{ filter_key }}-min">{{ 'facets.price_from' | t }}</label>
+                <div class="facets__price-input">
+                  <span aria-hidden="true">{{ cart.currency.symbol }}</span>
+                  <input
+                    type="number"
+                    id="{{ filter_key }}-min"
+                    name="{{ filter.min_value.param_name }}"
+                    inputmode="decimal"
+                    min="0"
+                    max="{{ filter.range_max | divided_by: 100.0 | round: 2 }}"
+                    step="any"
+                    placeholder="0"
+                    {% if filter.min_value.value != blank %}
+                      value="{{ filter.min_value.value | divided_by: 100.0 | round: 2 }}"
+                    {% endif %}
+                  >
+                </div>
+              </div>
+              <div class="facets__price-field">
+                <label for="{{ filter_key }}-max">{{ 'facets.price_to' | t }}</label>
+                <div class="facets__price-input">
+                  <span aria-hidden="true">{{ cart.currency.symbol }}</span>
+                  <input
+                    type="number"
+                    id="{{ filter_key }}-max"
+                    name="{{ filter.max_value.param_name }}"
+                    inputmode="decimal"
+                    min="0"
+                    max="{{ filter.range_max | divided_by: 100.0 | round: 2 }}"
+                    step="any"
+                    placeholder="{{ filter.range_max | divided_by: 100.0 | round: 2 }}"
+                    {% if filter.max_value.value != blank %}
+                      value="{{ filter.max_value.value | divided_by: 100.0 | round: 2 }}"
+                    {% endif %}
+                  >
+                </div>
+              </div>
+            </div>
+            {%- assign highest_price = filter.range_max | money_without_trailing_zeros -%}
+            <p class="facets__hint">{{ 'facets.price_highest' | t: price: highest_price }}</p>
+          {%- else -%}
+            <ul class="facets__list">
+              {%- for value in filter.values -%}
+                {%- assign value_id = filter_key | append: '-' | append: forloop.index -%}
+                {%- assign is_disabled = false -%}
+                {%- if value.count == 0 and value.active == false -%}
+                  {%- assign is_disabled = true -%}
+                {%- endif -%}
+                <li>
+                  <input
+                    type="checkbox"
+                    class="facets__checkbox"
+                    id="{{ value_id }}"
+                    name="{{ value.param_name }}"
+                    value="{{ value.value | escape }}"
+                    {% if value.active %}
+                      checked
+                    {% endif %}
+                    {% if is_disabled %}
+                      disabled
+                    {% endif %}
+                  >
+                  <label class="facets__label{% if is_disabled %} is-disabled{% endif %}" for="{{ value_id }}">
+                    {%- if value.swatch -%}
+                      <span
+                        class="facets__swatch"
+                        style="
+                          {%- if value.swatch.image -%}
+                            background-image: url({{ value.swatch.image | image_url: width: 64 }});
+                          {%- elsif value.swatch.color -%}
+                            background-color: rgb({{ value.swatch.color.rgb }});
+                          {%- endif -%}
+                        "
+                      ></span>
+                    {%- endif -%}
+                    <span class="facets__label-text">{{ value.label }}</span>
+                    <span class="facets__count">({{ value.count }})</span>
+                  </label>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+      </details>
+    {%- endfor -%}
+
+    <button type="submit" class="button button--full facets__apply">{{ 'facets.apply' | t }}</button>
+  </form>
+{%- endif -%}
+
+{% stylesheet %}
+  .facets__clear,
+  .facets-active__clear {
+    color: var(--color-primary);
+    font-weight: var(--font-body-weight-bold);
+  }
+
+  .facets__clear {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+
+  .facets__group {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .facets__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding-block: 0.375rem;
+    color: var(--color-text);
+    font-weight: var(--font-body-weight-bold);
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .facets__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .facets__summary-count {
+    margin-inline-start: 0.25rem;
+    color: var(--color-text-muted);
+    font-weight: var(--font-body-weight);
+  }
+
+  .facets__summary-icon {
+    display: inline-flex;
+    color: var(--color-primary);
+  }
+
+  .facets__summary-icon--minus,
+  .facets__group[open] .facets__summary-icon--plus {
+    display: none;
+  }
+
+  .facets__group[open] .facets__summary-icon--minus {
+    display: inline-flex;
+  }
+
+  .facets__content {
+    padding-bottom: 0.75rem;
+  }
+
+  .facets__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .facets__list li {
+    position: relative;
+  }
+
+  .facets__checkbox {
+    position: absolute;
+    top: 50%;
+    inset-inline-start: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0;
+    transform: translateY(-50%);
+    accent-color: var(--color-primary);
+  }
+
+  .facets__label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    margin: 0;
+    padding-inline-start: 1.875rem;
+    font-weight: var(--font-body-weight);
+    cursor: pointer;
+  }
+
+  .facets__label.is-disabled {
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+  }
+
+  .facets__count {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .facets__swatch {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex: none;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    background-position: center;
+    background-size: cover;
+  }
+
+  .facets__price {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .facets__price-field label {
+    font-weight: var(--font-body-weight);
+    font-size: 0.875rem;
+  }
+
+  .facets__price-input {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .facets__hint {
+    margin: 0.5rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .facets__apply {
+    margin-top: 1rem;
+  }
+
+  facets-container.is-enhanced .facets__apply {
+    display: none;
+  }
+
+  .facets-drawer-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .facets-active__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .facets-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 2.5rem;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-soft);
+    color: var(--color-on-soft);
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+
+  .facets-chip:hover {
+    border-color: var(--color-primary);
+  }
+
+  .facets-active__clear {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.5rem;
+    padding-inline: 0.5rem;
+  }
+{% endstylesheet %}

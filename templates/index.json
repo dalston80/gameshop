@@ -1,12 +1,213 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
-    "sections": {
-        "slideshow": {
-            "type": "slideshow",
-            "blocks": {
-            }
+  "sections": {
+    "slideshow": {
+      "type": "slideshow",
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "settings": {
+            "heading": "New releases are here",
+            "subtext": "Pre-order the games you have been waiting for",
+            "button_label": "Shop now",
+            "text_alignment": "left",
+            "overlay_opacity": 55
+          }
         }
+      },
+      "block_order": [
+        "slide-1"
+      ],
+      "settings": {
+        "height": "medium",
+        "autoplay": false,
+        "autoplay_speed": 6
+      }
     },
-    "order": [
-        "slideshow"
-    ]
+    "collection_tiles": {
+      "type": "collection-tiles",
+      "blocks": {
+        "tile-1": {
+          "type": "tile",
+          "settings": {}
+        },
+        "tile-2": {
+          "type": "tile",
+          "settings": {}
+        },
+        "tile-3": {
+          "type": "tile",
+          "settings": {}
+        },
+        "tile-4": {
+          "type": "tile",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "tile-1",
+        "tile-2",
+        "tile-3",
+        "tile-4"
+      ],
+      "settings": {
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    },
+    "latest_releases": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "Latest releases",
+        "collection": "all",
+        "products_to_show": 8,
+        "columns_desktop": 4,
+        "show_view_all": true,
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    },
+    "featured_product": {
+      "type": "featured-product",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {}
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {}
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "title",
+        "price",
+        "variant_picker",
+        "buy_buttons"
+      ],
+      "settings": {
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    },
+    "popular_categories": {
+      "type": "collection-icons",
+      "blocks": {
+        "category-1": {
+          "type": "category",
+          "settings": {}
+        },
+        "category-2": {
+          "type": "category",
+          "settings": {}
+        },
+        "category-3": {
+          "type": "category",
+          "settings": {}
+        },
+        "category-4": {
+          "type": "category",
+          "settings": {}
+        },
+        "category-5": {
+          "type": "category",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "category-1",
+        "category-2",
+        "category-3",
+        "category-4",
+        "category-5"
+      ],
+      "settings": {
+        "heading": "Popular categories",
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    },
+    "best_sellers": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "Best sellers",
+        "collection": "all",
+        "products_to_show": 8,
+        "columns_desktop": 4,
+        "show_view_all": true,
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    },
+    "news": {
+      "type": "blog-posts",
+      "settings": {
+        "heading": "GameShop News",
+        "post_limit": 3,
+        "show_date": true,
+        "show_excerpt": true,
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    },
+    "brand_partners": {
+      "type": "logo-list",
+      "blocks": {
+        "logo-1": {
+          "type": "logo",
+          "settings": {}
+        },
+        "logo-2": {
+          "type": "logo",
+          "settings": {}
+        },
+        "logo-3": {
+          "type": "logo",
+          "settings": {}
+        },
+        "logo-4": {
+          "type": "logo",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "logo-1",
+        "logo-2",
+        "logo-3",
+        "logo-4"
+      ],
+      "settings": {
+        "heading": "Brand partners",
+        "logo_width": 140,
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    }
+  },
+  "order": [
+    "slideshow",
+    "collection_tiles",
+    "latest_releases",
+    "featured_product",
+    "popular_categories",
+    "best_sellers",
+    "news",
+    "brand_partners"
+  ]
 }

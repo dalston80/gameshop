@@ -1,0 +1,240 @@
+{% doc %}
+  Renders cart line items with quantity controls. Shared by the cart drawer and the cart page.
+  Quantity changes are handled by `data-cart-change` controls in global.js.
+
+  @param {object} cart - The cart object
+  @param {string} [context] - Either 'drawer' or 'page'
+
+  @example
+  {% render 'cart-line-items', cart: cart, context: 'drawer' %}
+{% enddoc %}
+
+<ul class="cart-lines" role="list">
+  {%- for item in cart.items -%}
+    {%- assign line = forloop.index -%}
+    <li class="cart-line" id="cart-line-{{ context }}-{{ line }}">
+      <a class="cart-line__media media" href="{{ item.url }}" tabindex="-1" aria-hidden="true">
+        {%- if item.image -%}
+          {%- assign line_alt = item.image.alt | default: item.product.title -%}
+          {{ item.image | image_url: width: 240 | image_tag: width: 96, height: 96, loading: 'lazy', alt: line_alt }}
+        {%- endif -%}
+      </a>
+
+      <div class="cart-line__details">
+        <a class="cart-line__title" href="{{ item.url }}">{{ item.product.title }}</a>
+
+        {%- unless item.product.has_only_default_variant -%}
+          <dl class="cart-line__options">
+            {%- for option in item.options_with_values -%}
+              <div>
+                <dt>{{ option.name }}:</dt>
+                <dd>{{ option.value }}</dd>
+              </div>
+            {%- endfor -%}
+          </dl>
+        {%- endunless -%}
+
+        {%- if item.selling_plan_allocation -%}
+          <p class="cart-line__plan">{{ item.selling_plan_allocation.selling_plan.name }}</p>
+        {%- endif -%}
+
+        {%- assign property_size = item.properties | size -%}
+        {%- if property_size > 0 -%}
+          <dl class="cart-line__options">
+            {%- for property in item.properties -%}
+              {%- assign first_character = property.first | slice: 0 -%}
+              {%- if property.last != blank and first_character != '_' -%}
+                <div>
+                  <dt>{{ property.first }}:</dt>
+                  <dd>
+                    {%- if property.last contains '/uploads/' -%}
+                      <a href="{{ property.last }}">{{ property.last | split: '/' | last }}</a>
+                    {%- else -%}
+                      {{ property.last }}
+                    {%- endif -%}
+                  </dd>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </dl>
+        {%- endif -%}
+
+        <div class="cart-line__price price {% if item.original_line_price != item.final_line_price %}price--sale{% endif %}">
+          {%- if item.original_price != item.final_price -%}
+            <s class="price__compare"><span class="visually-hidden">{{ 'products.price.regular' | t }}</span>{{ item.original_price | money }}</s>
+          {%- endif -%}
+          <span class="price__current">{{ item.final_price | money }}</span>
+          {%- if item.unit_price_measurement -%}
+            <span class="price__unit">
+              {{ item.unit_price | money }} / {% if item.unit_price_measurement.reference_value != 1 %}{{ item.unit_price_measurement.reference_value }}{% endif %}{{ item.unit_price_measurement.reference_unit }}
+            </span>
+          {%- endif -%}
+        </div>
+
+        {%- if item.line_level_discount_allocations.size > 0 -%}
+          <ul class="cart-line__discounts" role="list">
+            {%- for allocation in item.line_level_discount_allocations -%}
+              <li>
+                {% render 'icon', name: 'check', class: 'icon--small' %}
+                {{ allocation.discount_application.title }} (-{{ allocation.amount | money }})
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+
+        <div class="cart-line__controls">
+          <quantity-input class="quantity">
+            <button
+              type="button"
+              class="quantity__button"
+              data-step="-1"
+              data-cart-change
+              data-line="{{ line }}"
+              data-quantity="{{ item.quantity | minus: 1 }}"
+              aria-label="{{ 'cart.general.decrease_quantity' | t: product: item.product.title }}"
+            >
+              {% render 'icon', name: 'minus', class: 'icon--small' %}
+            </button>
+            <input
+              type="number"
+              class="quantity__input"
+              value="{{ item.quantity }}"
+              min="0"
+              {% if item.variant.inventory_management == 'shopify' and item.variant.inventory_policy == 'deny' %}max="{{ item.variant.inventory_quantity }}"{% endif %}
+              aria-label="{{ 'cart.general.quantity_for' | t: product: item.product.title }}"
+              {% if context == 'page' %}
+                name="updates[]"
+                inputmode="numeric"
+              {% else %}
+                readonly
+              {% endif %}
+            >
+            <button
+              type="button"
+              class="quantity__button"
+              data-step="1"
+              data-cart-change
+              data-line="{{ line }}"
+              data-quantity="{{ item.quantity | plus: 1 }}"
+              aria-label="{{ 'cart.general.increase_quantity' | t: product: item.product.title }}"
+            >
+              {% render 'icon', name: 'plus', class: 'icon--small' %}
+            </button>
+          </quantity-input>
+
+          <a
+            class="cart-line__remove"
+            href="{{ item.url_to_remove }}"
+            data-cart-change
+            data-line="{{ line }}"
+            data-quantity="0"
+            aria-label="{{ 'cart.general.remove' | t: product: item.product.title }}"
+          >
+            {% render 'icon', name: 'trash', class: 'icon--small' %}
+            <span>{{ 'cart.general.remove_short' | t }}</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="cart-line__total">
+        {%- if item.original_line_price != item.final_line_price -%}
+          <s class="price__compare">{{ item.original_line_price | money }}</s>
+        {%- endif -%}
+        <span class="price__current">{{ item.final_line_price | money }}</span>
+      </div>
+    </li>
+  {%- endfor -%}
+</ul>
+
+{% stylesheet %}
+  .cart-lines {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cart-line {
+    display: grid;
+    grid-template-columns: 5rem 1fr auto;
+    gap: 0.75rem 1rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .cart-line__media {
+    width: 5rem;
+    aspect-ratio: 1;
+  }
+
+  .cart-line__media img {
+    object-fit: contain;
+  }
+
+  .cart-line__title {
+    color: var(--color-text);
+    font-weight: var(--font-body-weight-bold);
+    text-decoration: none;
+  }
+
+  .cart-line__title:hover {
+    text-decoration: underline;
+  }
+
+  .cart-line__options,
+  .cart-line__plan {
+    margin: 0.25rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .cart-line__options div {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .cart-line__options dd {
+    margin: 0;
+  }
+
+  .cart-line__discounts {
+    display: grid;
+    gap: 0.125rem;
+    margin: 0.25rem 0 0;
+    padding: 0;
+    color: var(--color-accent-text);
+    font-size: 0.875rem;
+    list-style: none;
+  }
+
+  .cart-line__discounts li {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .cart-line__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  .cart-line__remove {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 2.75rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .cart-line__total {
+    text-align: end;
+  }
+
+  [data-cart-change][aria-disabled='true'] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+{% endstylesheet %}

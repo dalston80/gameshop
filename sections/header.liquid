@@ -1,157 +1,524 @@
-<header class="gs-store-header bg-primary {% if section.settings.enable_sticky_header %}sticky-header{% endif %}">
-    <form class="mobile-search-form bg-primary" action="/search" method="get">
-        <predictive-search>
-            <input type="search" name="q" placeholder="Search..." data-predictive-search-input>
-            <div class="predictive-search-results" data-predictive-search-results></div>
-            <button class="bg-secondary text-white m-1" type="submit">{% render 'icon_search' %}</button>
-        </predictive-search>
-    </form>
-    <div id="mobile-menu" class="mobile-menu bg-white">
-        <div class="mobile-menu-header">
-            <button class="btn btn-close" aria-label="Close Menu">
-                {% render 'icon_close' %}
-            </button>
-        </div>
-        <ul class="p-1" aria-hidden="true">
-            {% for link in linklists[section.settings.menu].links %}
-                <li {% if link.links != blank %}class="has-children"{% endif %}>
-                    <div class="mobile-menu-link">
-                        <a href="{{ link.url }}">{{ link.title }}</a> {% if link.links != blank %}<button class="btn-toggle-sub-menu" aria-label="Toggle Sub Menu">{% render 'icon_chevron' %}</button>{% endif %}
-                    </div>
-                    {% if link.links != blank %}
-                        {% if link.type == 'mega_menu' %}
-                            <div class="mega-menu" aria-hidden="true">
-                                {% render 'mega-menu', menu: link %}
-                            </div>
-                        {% else %}
-                            <ul class="sub-menu" aria-hidden="true">
-                                {% for child_link in link.links %}
-                                    <li {% if child_link.links != blank %}class="has-children"{% endif %}>
-                                        <div class="mobile-menu-link">
-                                            <a href="{{ child_link.url }}">{{ child_link.title }}</a> {% if child_link.links != blank %}<button class="btn-toggle-sub-menu" aria-label="Toggle Sub Menu">{% render 'icon_chevron' %}</button>{% endif %}
-                                        </div>
-                                        {% if child_link.links != blank %}
-                                            {% if child_link.type == 'mega_menu' %}
-                                                <div class="mega-menu" aria-hidden="true">
-                                                    {% render 'mega-menu', menu: child_link %}
-                                                </div>
-                                            {% else %}
-                                                <ul class="sub-menu" aria-hidden="true">
-                                                    {% for grandchild_link in child_link.links %}
-                                                        <li>
-                                                            <div class="mobile-menu-link">
-                                                                <a href="{{ grandchild_link.url }}">{{ grandchild_link.title }}</a>
-                                                            </div>
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
-                                            {% endif %}
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div class="container">
-        <div class="header-content">
-            <div class="left-side">
-                <nav role="navigation">
-                    <a class="menu-btn" href="#" aria-hidden="false">
-                        <span>{% render 'icon_hamburger' %}</span>
-                    </a>
-                </nav>
-                <div class="logo text-white">
-                    {% if section.settings.logo_image != blank %}
-                         <img src="{{section.settings.logo_image | image_url: 'master'}}" alt="{{section.settings.logo_text}}" width="100" height="100">
-                    {% else %}
-                         <span>{% if section.settings.logo_text != blank %}{{ section.settings.logo_text }}{% else %}GameShop{% endif %}</span>
-                    {% endif %}
-                </div>
-                <form class="search-form bg-primary" action="/search" method="get">
-                    <predictive-search>
-                        <div class="predictive-search-wrapper" data-predictive-search>
-                          <input
-                            type="search"
-                            name="q"
-                            placeholder="Search..."
-                            class="search-input"
-                            data-predictive-search-input
-                            aria-label="Search..."
-                            aria-autocomplete="list"
-                            aria-owns="predictive-search-results"
-                            aria-expanded="false"
-                            autocomplete="off"
-                          >
-                          <button type="submit" class="bg-secondary text-white m-1">
-                            {% render 'icon_search' %}
-                          </button>
-                          <div id="predictive-search-results" class="predictive-search-results" tabindex="-1" data-predictive-search-results></div>
-                        </div>
-                      </predictive-search>
-                </form>
-            </div>
+{%- liquid
+  assign main_menu = section.settings.menu
+  assign logo = section.settings.logo
+  assign show_country = false
+  assign show_language = false
+  if section.settings.show_localization and localization.available_countries.size > 1
+    assign show_country = true
+  endif
+  if section.settings.show_localization and localization.available_languages.size > 1
+    assign show_language = true
+  endif
+-%}
 
-            <div class="right-side">
-                <div class="currency-select">
-                    {% form 'currency' %}
-                        <select name="currency">
-                          {% for currency in shop.enabled_currencies %}
-                            <option value="{{ currency.iso_code }}"{% if currency == cart.currency %} selected{% endif %}>
-                              {{ currency.iso_code }} {{ currency.symbol }}
-                            </option>
-                          {% endfor %}
-                        </select>
-                    {% endform %}
-                </div>
-                <div class="login-signup text-bold text-white">
-                    <a class="text-white" href="/account/login">Login</a> or <a href="/account/register"><span class="text-secondary">Sign Up</span></a>
-                </div>
-                <div class="cart-search">
-                    <button href="#" class="text-white search">{% render 'icon_search' %}</button>
-                    <a href="#" class="text-white cart">
-                        {% render 'icon_cart' %}
-                        <span class="cart-count bg-secondary">
-                            <span>0</span>
-                        </span>
-                    </a>
-                </div>
-            </div>
-        </div>
+<header class="site-header {% if section.settings.sticky %}site-header--sticky{% endif %}">
+  <div class="site-header__bar">
+    <div class="page-width site-header__bar-inner">
+      <menu-drawer id="menu-drawer-{{ section.id }}" class="site-header__menu-toggle">
+        <button
+          type="button"
+          class="icon-button"
+          data-dialog-open="menu-drawer-{{ section.id }}"
+          aria-label="{{ 'general.header.open_menu' | t }}"
+        >
+          {% render 'icon', name: 'menu' %}
+        </button>
+
+        <dialog class="drawer drawer--start" aria-label="{{ 'general.header.menu' | t }}">
+          <div class="drawer__header">
+            <span class="drawer__title">{{ 'general.header.menu' | t }}</span>
+            <button type="button" class="icon-button" data-dialog-close aria-label="{{ 'general.header.close_menu' | t }}">
+              {% render 'icon', name: 'close' %}
+            </button>
+          </div>
+          <nav class="drawer__body" aria-label="{{ 'general.header.main_navigation' | t }}">
+            <ul class="mobile-nav">
+              {%- for link in main_menu.links -%}
+                <li class="mobile-nav__item">
+                  {%- if link.links != blank -%}
+                    <details>
+                      <summary>
+                        <span>{{ link.title }}</span>
+                        {% render 'icon', name: 'chevron-down', class: 'icon--small' %}
+                      </summary>
+                      <ul class="mobile-nav__sub">
+                        <li><a href="{{ link.url }}">{{ 'general.header.shop_all' | t: title: link.title }}</a></li>
+                        {%- for child in link.links -%}
+                          <li>
+                            {%- if child.links != blank -%}
+                              <details>
+                                <summary>
+                                  <span>{{ child.title }}</span>
+                                  {% render 'icon', name: 'chevron-down', class: 'icon--small' %}
+                                </summary>
+                                <ul class="mobile-nav__sub">
+                                  <li><a href="{{ child.url }}">{{ 'general.header.shop_all' | t: title: child.title }}</a></li>
+                                  {%- for grandchild in child.links -%}
+                                    <li><a href="{{ grandchild.url }}">{{ grandchild.title }}</a></li>
+                                  {%- endfor -%}
+                                </ul>
+                              </details>
+                            {%- else -%}
+                              <a href="{{ child.url }}">{{ child.title }}</a>
+                            {%- endif -%}
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </details>
+                  {%- else -%}
+                    <a href="{{ link.url }}">{{ link.title }}</a>
+                  {%- endif -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+          </nav>
+        </dialog>
+      </menu-drawer>
+
+      <a class="site-header__logo" href="{{ routes.root_url }}">
+        {%- if logo != blank -%}
+          {%- assign logo_width = section.settings.logo_width -%}
+          {%- assign logo_sizes = logo_width | append: 'px' -%}
+          {{
+            logo
+            | image_url: width: 400
+            | image_tag:
+              width: logo_width,
+              widths: '100, 150, 200, 300, 400',
+              sizes: logo_sizes,
+              alt: shop.name,
+              loading: 'eager',
+              fetchpriority: 'high'
+          }}
+        {%- else -%}
+          {% render 'icon', name: 'gamepad', class: 'site-header__logo-icon' %}
+          <span>{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+
+      <div class="site-header__search">
+        {% render 'search-form', id: 'header-search' %}
+      </div>
+
+      <div class="site-header__actions">
+        <details class="site-header__search-toggle">
+          <summary class="icon-button" aria-label="{{ 'general.search.title' | t }}">
+            {% render 'icon', name: 'search' %}
+          </summary>
+          <div class="site-header__search-panel">
+            {% render 'search-form', id: 'header-search-mobile' %}
+          </div>
+        </details>
+
+        {%- if show_country or show_language -%}
+          <div class="site-header__localization">
+            {% render 'localization-form', show_country: show_country, show_language: show_language, id: 'header' %}
+          </div>
+        {%- endif -%}
+
+        {%- if shop.customer_accounts_enabled -%}
+          <shopify-account class="site-header__account" menu="{{ section.settings.customer_account_menu }}"></shopify-account>
+        {%- endif -%}
+
+        <a class="site-header__cart icon-button" href="{{ routes.cart_url }}" data-dialog-open="cart-drawer">
+          {% render 'icon', name: 'cart' %}
+          <span class="visually-hidden">{{ 'general.header.cart' | t }}</span>
+          <span class="site-header__cart-count" data-cart-count>{{ cart.item_count }}</span>
+        </a>
+      </div>
     </div>
+  </div>
+
+  {%- if main_menu.links.size > 0 or section.settings.promo_text != blank -%}
+    <div class="site-header__nav">
+      <div class="page-width site-header__nav-inner">
+        <nav aria-label="{{ 'general.header.main_navigation' | t }}">
+          <ul class="main-nav">
+            {%- for link in main_menu.links -%}
+              <li class="main-nav__item {% if link.links != blank %}main-nav__item--parent{% endif %}">
+                <a
+                  href="{{ link.url }}"
+                  {% if link.current or link.child_current %}aria-current="page"{% endif %}
+                >
+                  {{ link.title }}
+                  {%- if link.links != blank %}
+                    {% render 'icon', name: 'chevron-down', class: 'icon--small' %}
+                  {%- endif -%}
+                </a>
+                {%- if link.links != blank -%}
+                  <div class="main-nav__panel">
+                    <ul class="main-nav__columns">
+                      {%- for child in link.links -%}
+                        <li>
+                          <a class="main-nav__child" href="{{ child.url }}">{{ child.title }}</a>
+                          {%- if child.links != blank -%}
+                            <ul>
+                              {%- for grandchild in child.links -%}
+                                <li><a href="{{ grandchild.url }}">{{ grandchild.title }}</a></li>
+                              {%- endfor -%}
+                            </ul>
+                          {%- endif -%}
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  </div>
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+
+        {%- if section.settings.promo_text != blank -%}
+          <p class="site-header__promo">
+            {%- if section.settings.promo_link != blank -%}
+              <a href="{{ section.settings.promo_link }}">{{ section.settings.promo_text }}</a>
+            {%- else -%}
+              {{ section.settings.promo_text }}
+            {%- endif -%}
+          </p>
+        {%- endif -%}
+      </div>
+    </div>
+  {%- endif -%}
 </header>
 
+{% stylesheet %}
+  .site-header--sticky {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  .site-header__bar {
+    position: relative;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  .site-header__bar a,
+  .site-header__bar summary {
+    color: inherit;
+  }
+
+  .site-header__bar-inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    min-height: 3.5rem;
+  }
+
+  .site-header__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: var(--font-heading-weight);
+    text-decoration: none;
+  }
+
+  .site-header__logo-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .site-header__search {
+    display: none;
+  }
+
+  .site-header__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+  }
+
+  .site-header__menu-toggle {
+    display: contents;
+  }
+
+  .site-header__cart {
+    position: relative;
+  }
+
+  .site-header__cart-count {
+    position: absolute;
+    top: 0.125rem;
+    inset-inline-end: 0;
+    min-width: 1.25rem;
+    padding: 0 0.25rem;
+    border-radius: 999px;
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    font-size: 0.75rem;
+    font-weight: var(--font-body-weight-bold);
+    line-height: 1.25rem;
+    text-align: center;
+  }
+
+  .site-header__search-toggle summary {
+    list-style: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  .site-header__search-toggle summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .site-header__search-panel {
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    padding: 0.75rem var(--page-margin);
+    background: var(--color-primary);
+  }
+
+  .site-header__nav {
+    display: none;
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-background);
+  }
+
+  .site-header__localization form {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  @media (min-width: 990px) {
+    .site-header__bar-inner {
+      grid-template-columns: auto minmax(16rem, 1fr) auto;
+      gap: 2rem;
+      min-height: 4rem;
+    }
+
+    .site-header__menu-toggle,
+    .site-header__search-toggle {
+      display: none;
+    }
+
+    .site-header__search {
+      display: block;
+      max-width: 40rem;
+      width: 100%;
+      margin-inline: auto;
+    }
+
+    .site-header__nav {
+      display: block;
+    }
+
+    .site-header__nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+  }
+
+  .main-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .main-nav__item {
+    position: relative;
+  }
+
+  .main-nav__item > a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 2.75rem;
+    padding: 0 0.75rem;
+    color: var(--color-text);
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+
+  .main-nav__item > a:hover,
+  .main-nav__item > a[aria-current] {
+    box-shadow: inset 0 -3px 0 var(--color-accent);
+  }
+
+  .main-nav__panel {
+    position: absolute;
+    top: 100%;
+    inset-inline-start: 0;
+    z-index: 30;
+    display: none;
+    min-width: 14rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0 0 var(--radius) var(--radius);
+    background: var(--color-background);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+  }
+
+  .main-nav__item--parent:hover > .main-nav__panel,
+  .main-nav__item--parent:focus-within > .main-nav__panel {
+    display: block;
+  }
+
+  .main-nav__columns {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(10rem, 1fr);
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .main-nav__columns ul {
+    margin: 0.25rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .main-nav__panel a {
+    display: block;
+    padding: 0.25rem 0;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .main-nav__panel a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .main-nav__child {
+    font-weight: var(--font-body-weight-bold);
+  }
+
+  .site-header__promo {
+    margin: 0;
+    color: var(--color-primary);
+    font-size: 0.875rem;
+    font-weight: var(--font-body-weight-bold);
+  }
+
+  .site-header__promo a {
+    color: inherit;
+  }
+
+  .mobile-nav,
+  .mobile-nav__sub {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mobile-nav__sub {
+    padding-inline-start: 1rem;
+  }
+
+  .mobile-nav a,
+  .mobile-nav summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 2.75rem;
+    color: var(--color-text);
+    font-size: 1.0625rem;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .mobile-nav summary {
+    list-style: none;
+  }
+
+  .mobile-nav summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .mobile-nav details[open] > summary .icon {
+    transform: rotate(180deg);
+  }
+{% endstylesheet %}
 
 {% schema %}
-  {
-    "name": "Header",
-    "settings": [
-        {
-            "type": "checkbox",
-            "id": "enable_sticky_header",
-            "label": "Enable sticky header",
-            "default": true
-        },
-        {
-            "type": "text",
-            "id": "logo_text",
-            "label": "Logo Text",
-            "default": "GameShop"
-        },
-        {
-            "type": "link_list",
-            "id": "menu",
-            "label": "Header Menu",
-            "default": "main-menu"
-        },
-        {
-            "type": "image_picker",
-            "id": "logo_image",
-            "label": "Logo Image"
-        }
-    ]
-  }
+{
+  "name": "t:sections.header.name",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header_logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "t:sections.header.settings.logo.label"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 60,
+      "max": 240,
+      "step": 10,
+      "unit": "px",
+      "label": "t:sections.header.settings.logo_width.label",
+      "default": 140
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header_navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "t:sections.header.settings.menu.label",
+      "default": "main-menu"
+    },
+    {
+      "type": "text",
+      "id": "promo_text",
+      "label": "t:sections.header.settings.promo_text.label",
+      "info": "t:sections.header.settings.promo_text.info"
+    },
+    {
+      "type": "url",
+      "id": "promo_link",
+      "label": "t:sections.header.settings.promo_link.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header_account"
+    },
+    {
+      "type": "link_list",
+      "id": "customer_account_menu",
+      "label": "t:sections.header.settings.customer_account_menu.label",
+      "default": "customer-account-main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_localization",
+      "label": "t:sections.header.settings.show_localization.label",
+      "info": "t:sections.header.settings.show_localization.info",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "t:sections.header.settings.header_behavior"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "t:sections.header.settings.sticky.label",
+      "default": true
+    }
+  ]
+}
 {% endschema %}

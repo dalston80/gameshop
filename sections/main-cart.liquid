@@ -1,0 +1,141 @@
+{%- assign form_id = 'cart-form' -%}
+
+<div
+  class="main-cart section page-width"
+  style="--section-padding-top: {{ section.settings.padding_top }}px; --section-padding-bottom: {{ section.settings.padding_bottom }}px;"
+>
+  {%- if cart.item_count == 0 -%}
+    <div class="main-cart__empty empty-state">
+      <h1>{{ 'cart.general.title' | t }}</h1>
+      <p>{{ 'cart.general.empty' | t }}</p>
+      <div class="main-cart__empty-actions">
+        <a class="button" href="{{ routes.all_products_collection_url }}">{{ 'cart.general.continue_shopping' | t }}</a>
+        {%- if section.settings.collection != blank -%}
+          <a class="button button--secondary" href="{{ section.settings.collection.url }}">
+            {{ 'cart.page.browse_collection' | t: title: section.settings.collection.title }}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  {%- else -%}
+    <h1 class="main-cart__title">{{ 'cart.general.title' | t }}</h1>
+
+    <div class="main-cart__layout">
+      <form action="{{ routes.cart_url }}" method="post" id="{{ form_id }}" class="main-cart__form" novalidate>
+        {% render 'cart-line-items', cart: cart, context: 'page' %}
+
+        {%- if settings.cart_show_note -%}
+          <div class="main-cart__note field">
+            <label for="cart-page-note">{{ 'cart.general.note_label' | t }}</label>
+            <textarea id="cart-page-note" name="note" rows="3">{{ cart.note }}</textarea>
+          </div>
+        {%- endif -%}
+
+        <noscript>
+          <button type="submit" name="update" class="button button--secondary">{{ 'cart.page.update' | t }}</button>
+        </noscript>
+      </form>
+
+      <aside class="main-cart__summary" aria-labelledby="cart-summary-title">
+        <h2 id="cart-summary-title" class="main-cart__summary-title">{{ 'cart.page.summary' | t }}</h2>
+        {% render 'cart-summary', cart: cart, form_id: form_id, show_additional_buttons: true %}
+        <a class="main-cart__continue" href="{{ routes.all_products_collection_url }}">
+          {{ 'cart.general.continue_shopping' | t }}
+        </a>
+      </aside>
+    </div>
+
+    <script src="{{ 'cart.js' | asset_url }}" defer></script>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .main-cart__title {
+    margin-bottom: 1.5rem;
+  }
+
+  .main-cart__layout {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .main-cart__note {
+    margin-top: 1.5rem;
+  }
+
+  .main-cart__summary {
+    padding: 1.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-soft);
+    color: var(--color-on-soft);
+  }
+
+  .main-cart__summary a:not(.button) {
+    color: inherit;
+  }
+
+  .main-cart__summary-title {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+  }
+
+  .main-cart__continue {
+    display: inline-block;
+    margin-top: 1rem;
+  }
+
+  .main-cart__empty-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  @media (min-width: 990px) {
+    .main-cart__layout {
+      grid-template-columns: minmax(0, 1fr) 24rem;
+      align-items: start;
+      gap: 3rem;
+    }
+
+    .main-cart__summary {
+      position: sticky;
+      top: 1.5rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.main_cart.name",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:sections.main_cart.settings.collection.label",
+      "info": "t:sections.main_cart.settings.collection.info"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding_top",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding_bottom",
+      "default": 32
+    }
+  ]
+}
+{% endschema %}

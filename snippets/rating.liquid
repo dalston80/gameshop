@@ -1,0 +1,24 @@
+{% doc %}
+  Renders star rating from the standard `reviews.rating` and `reviews.rating_count` product metafields
+  (written by any review app). Outputs nothing when no rating exists, so the theme never fakes data.
+
+  @param {product} product - The product
+
+  @example
+  {% render 'rating', product: product %}
+{% enddoc %}
+
+{%- liquid
+  assign rating = product.metafields.reviews.rating.value
+  assign rating_count = product.metafields.reviews.rating_count
+-%}
+
+{%- if rating != blank and rating_count.value > 0 -%}
+  {%- assign scale_max = rating.scale_max | default: 5 -%}
+  {%- assign percent = rating.rating | times: 100.0 | divided_by: scale_max -%}
+  <span class="rating">
+    <span class="rating__stars" style="--rating-percent: {{ percent | round: 1 }}%" aria-hidden="true"></span>
+    <span class="visually-hidden">{{ 'products.rating.label' | t: rating: rating.rating, max: scale_max }}</span>
+    <span>{{ 'products.rating.count' | t: count: rating_count.value }}</span>
+  </span>
+{%- endif -%}

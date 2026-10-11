@@ -1,0 +1,301 @@
+{% doc %}
+  Renders the product media gallery: one visible media frame, previous/next buttons and a thumbnail strip.
+  Behaviour lives in the <product-gallery> custom element in assets/product.js.
+
+  @param {product} product - The product
+  @param {string} section_id - The id of the section that renders the gallery
+  @param {object} [selected_media] - The media shown first (for example the selected variant's media)
+  @param {string} [thumbnails] - 'start' (beside the media), 'bottom' or 'none'
+  @param {string} [sizes] - The image `sizes` attribute for the main media
+
+  @example
+  {% render 'product-gallery', product: product, section_id: section.id, selected_media: variant.featured_media %}
+{% enddoc %}
+
+{%- liquid
+  assign thumbnails = thumbnails | default: 'start'
+  assign media_count = product.media.size
+  assign selected_id = selected_media.id | default: product.media.first.id
+  if media_count < 2
+    assign thumbnails = 'none'
+  endif
+  assign has_model = false
+  for media in product.media
+    if media.media_type == 'model'
+      assign has_model = true
+      break
+    endif
+  endfor
+-%}
+
+<product-gallery
+  class="product-gallery product-gallery--{{ thumbnails }}"
+  data-section-id="{{ section_id }}"
+  data-position-label="{{ 'products.gallery.position' | t: position: '[position]', total: '[total]' | escape }}"
+>
+  <div class="product-gallery__stage">
+    <ul
+      class="product-gallery__list"
+      role="list"
+      aria-label="{{ 'products.gallery.label' | t }}"
+    >
+      {%- for media in product.media -%}
+        <li
+          class="product-gallery__item"
+          data-media-id="{{ media.id }}"
+          data-media-type="{{ media.media_type }}"
+          {% unless media.id == selected_id %}
+            hidden
+          {% endunless %}
+        >
+          {%- assign is_selected = false -%}
+          {%- if media.id == selected_id -%}
+            {%- assign is_selected = true -%}
+          {%- endif -%}
+          {% render 'product-media', media: media, fallback_alt: product.title, sizes: sizes, eager: is_selected %}
+        </li>
+      {%- else -%}
+        <li class="product-gallery__item product-gallery__item--placeholder">
+          {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        </li>
+      {%- endfor -%}
+    </ul>
+
+    {%- if media_count > 1 -%}
+      <button
+        type="button"
+        class="product-gallery__nav product-gallery__nav--previous"
+        data-gallery-previous
+        aria-label="{{ 'products.gallery.previous' | t }}"
+      >
+        {% render 'icon', name: 'chevron-left' %}
+      </button>
+      <button
+        type="button"
+        class="product-gallery__nav product-gallery__nav--next"
+        data-gallery-next
+        aria-label="{{ 'products.gallery.next' | t }}"
+      >
+        {% render 'icon', name: 'chevron-right' %}
+      </button>
+    {%- endif -%}
+
+    <p class="visually-hidden" role="status" data-gallery-status></p>
+  </div>
+
+  {%- if thumbnails != 'none' -%}
+    <div class="product-gallery__thumbs">
+      <ul class="product-gallery__thumb-list" role="list">
+        {%- for media in product.media -%}
+          <li>
+            <button
+              type="button"
+              class="product-gallery__thumb"
+              data-media-id="{{ media.id }}"
+              aria-label="{{ 'products.gallery.show_media' | t: position: forloop.index, total: media_count }}"
+              {% if media.id == selected_id %}
+                aria-current="true"
+              {% endif %}
+            >
+              {{
+                media.preview_image
+                | image_url: width: 160
+                | image_tag: widths: '80, 120, 160', sizes: '80px', loading: 'lazy', alt: ''
+              }}
+              {%- if media.media_type == 'video' or media.media_type == 'external_video' -%}
+                <span class="product-gallery__thumb-badge">
+                  {% render 'icon', name: 'play', class: 'icon--small' %}
+                  <span class="visually-hidden">{{ 'products.gallery.video' | t }}</span>
+                </span>
+              {%- elsif media.media_type == 'model' -%}
+                <span class="product-gallery__thumb-badge">
+                  <span aria-hidden="true">3D</span>
+                  <span class="visually-hidden">{{ 'products.gallery.model' | t }}</span>
+                </span>
+              {%- endif -%}
+            </button>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endif -%}
+
+  {%- if has_model -%}
+    <link
+      rel="stylesheet"
+      href="https://cdn.shopify.com/shopifycloud/model-viewer-ui/assets/v1.0/model-viewer-ui.css"
+      media="print"
+      onload="this.media='all'"
+    >
+  {%- endif -%}
+</product-gallery>
+
+{% stylesheet %}
+  .product-gallery {
+    display: grid;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+
+  .product-gallery__stage {
+    position: relative;
+    min-width: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-background);
+  }
+
+  .product-gallery__list {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    list-style: none;
+    border-radius: var(--radius);
+    aspect-ratio: var(--gallery-ratio, 1 / 1);
+    touch-action: pan-y;
+  }
+
+  .product-gallery__item {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .product-gallery__item[hidden] {
+    display: none;
+  }
+
+  .product-gallery__item--placeholder svg {
+    width: 100%;
+    height: 100%;
+    background: var(--color-soft);
+    fill: var(--color-on-soft);
+  }
+
+  .product-gallery__item iframe,
+  .product-gallery__item video,
+  .product-gallery__item model-viewer {
+    width: 100%;
+    height: 100%;
+  }
+
+  .product-gallery__nav {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+
+  .product-gallery__nav--previous {
+    inset-inline-start: 0.5rem;
+  }
+
+  .product-gallery__nav--next {
+    inset-inline-end: 0.5rem;
+  }
+
+  .product-gallery__nav svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .product-gallery__nav:hover {
+    filter: brightness(1.15);
+  }
+
+  .product-gallery__thumbs {
+    min-width: 0;
+  }
+
+  .product-gallery__thumb-list {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0.25rem;
+    overflow-x: auto;
+    list-style: none;
+  }
+
+  .product-gallery__thumb {
+    position: relative;
+    display: block;
+    width: 4.5rem;
+    height: 4.5rem;
+    padding: 0;
+    overflow: hidden;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-background);
+    cursor: pointer;
+  }
+
+  .product-gallery__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .product-gallery__thumb[aria-current='true'] {
+    border-color: var(--color-accent-text);
+  }
+
+  .product-gallery__thumb-badge {
+    position: absolute;
+    inset-inline-end: 0.125rem;
+    inset-block-end: 0.125rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding: 0 0.25rem;
+    border-radius: var(--radius);
+    background: var(--color-text);
+    color: var(--color-background);
+    font-size: 0.6875rem;
+    font-weight: var(--font-body-weight-bold);
+    line-height: 1;
+  }
+
+  @media (min-width: 750px) {
+    .product-gallery--start {
+      grid-template-columns: 5.25rem minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .product-gallery--start .product-gallery__stage {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .product-gallery--start .product-gallery__thumbs {
+      position: relative;
+      grid-column: 1;
+      grid-row: 1;
+      align-self: stretch;
+    }
+
+    .product-gallery--start .product-gallery__thumb-list {
+      position: absolute;
+      inset: 0;
+      flex-direction: column;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+  }
+{% endstylesheet %}

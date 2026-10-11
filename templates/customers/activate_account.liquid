@@ -1,0 +1,39 @@
+{{ 'customer.css' | asset_url | stylesheet_tag }}
+
+<div class="customer customer--narrow page-width">
+  <h1 class="customer__title">{{ 'customer.activate_account.title' | t }}</h1>
+  <p>{{ 'customer.activate_account.subtext' | t }}</p>
+
+  {%- form 'activate_customer_password', novalidate: 'novalidate', class: 'customer__form' -%}
+    {% render 'customer-form-errors', form: form %}
+
+    <div class="field">
+      <label for="activate-password">{{ 'customer.fields.password' | t }}</label>
+      <input
+        id="activate-password"
+        type="password"
+        name="customer[password]"
+        autocomplete="new-password"
+        required
+        {% if form.errors contains 'password' %}aria-invalid="true"{% endif %}
+      >
+    </div>
+
+    <div class="field">
+      <label for="activate-password-confirmation">{{ 'customer.fields.password_confirmation' | t }}</label>
+      <input
+        id="activate-password-confirmation"
+        type="password"
+        name="customer[password_confirmation]"
+        autocomplete="new-password"
+        required
+        {% if form.errors contains 'password_confirmation' %}aria-invalid="true"{% endif %}
+      >
+    </div>
+
+    <div class="customer__actions">
+      <button type="submit" class="button">{{ 'customer.activate_account.submit' | t }}</button>
+      <button type="submit" name="decline" class="button button--ghost">{{ 'customer.activate_account.decline' | t }}</button>
+    </div>
+  {%- endform -%}
+</div>

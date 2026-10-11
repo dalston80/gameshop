@@ -1,0 +1,120 @@
+{% doc %}
+  Renders a breadcrumb trail (Home > parent menu items > current page) with BreadcrumbList structured data.
+  Parent items are found by locating the collection in the given menu (up to three levels deep) and walking
+  up its ancestors. When the collection is not in the menu the trail falls back to Home > Collection.
+
+  @param {string} [type] - 'collection' (default) or 'product'
+  @param {object} [collection] - The current collection (required for type 'collection', optional context for 'product')
+  @param {product} [product] - The current product (required for type 'product')
+  @param {object} [menu] - The menu (link_list) to search for the collection's ancestors
+
+  @example
+  {% render 'breadcrumbs', type: 'collection', collection: collection, menu: linklists['main-menu'] %}
+  {% render 'breadcrumbs', type: 'product', product: product, collection: collection, menu: linklists['main-menu'] %}
+{% enddoc %}
+
+{%- liquid
+  assign separator = '~~~'
+  assign type = type | default: 'collection'
+  assign target_url = collection.url
+  assign found = false
+  assign ancestors_titles = ''
+  assign ancestors_urls = ''
+
+  if menu != blank and target_url != blank
+    for link_1 in menu.links
+      if found
+        break
+      endif
+      if link_1.url == target_url
+        assign found = true
+      else
+        for link_2 in link_1.links
+          if found
+            break
+          endif
+          if link_2.url == target_url
+            assign found = true
+            assign ancestors_titles = link_1.title
+            assign ancestors_urls = link_1.url
+          else
+            for link_3 in link_2.links
+              if link_3.url == target_url
+                assign found = true
+                assign ancestors_titles = link_1.title | append: separator | append: link_2.title
+                assign ancestors_urls = link_1.url | append: separator | append: link_2.url
+                break
+              endif
+            endfor
+          endif
+        endfor
+      endif
+    endfor
+  endif
+
+  assign link_titles = 'breadcrumbs.home' | t
+  assign link_urls = routes.root_url
+
+  if ancestors_titles != blank
+    assign link_titles = link_titles | append: separator | append: ancestors_titles
+    assign link_urls = link_urls | append: separator | append: ancestors_urls
+  endif
+
+  if type == 'product'
+    assign current_title = product.title
+    if collection != blank
+      assign link_titles = link_titles | append: separator | append: collection.title
+      assign link_urls = link_urls | append: separator | append: collection.url
+    endif
+  else
+    assign current_title = collection.title
+  endif
+
+  assign title_list = link_titles | split: separator
+  assign url_list = link_urls | split: separator
+-%}
+
+<nav class="breadcrumbs" aria-label="{{ 'breadcrumbs.label' | t }}">
+  <ol>
+    {%- for crumb_title in title_list -%}
+      {%- assign crumb_url = url_list[forloop.index0] -%}
+      <li>
+        {%- if crumb_url != blank and crumb_url != '#' -%}
+          <a href="{{ crumb_url }}">{{ crumb_title }}</a>
+        {%- else -%}
+          <span>{{ crumb_title }}</span>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+    <li><span aria-current="page">{{ current_title }}</span></li>
+  </ol>
+</nav>
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {%- for crumb_title in title_list -%}
+        {%- assign crumb_url = url_list[forloop.index0] -%}
+        {
+          "@type": "ListItem",
+          "position": {{ forloop.index }},
+          "name": {{ crumb_title | json }}
+          {%- if crumb_url != blank and crumb_url != '#' -%}
+            {%- if crumb_url contains '://' -%}
+              , "item": {{ crumb_url | json }}
+            {%- else -%}
+              , "item": {{ request.origin | append: crumb_url | json }}
+            {%- endif -%}
+          {%- endif -%}
+        },
+      {%- endfor -%}
+      {
+        "@type": "ListItem",
+        "position": {{ title_list.size | plus: 1 }},
+        "name": {{ current_title | json }}
+      }
+    ]
+  }
+</script>

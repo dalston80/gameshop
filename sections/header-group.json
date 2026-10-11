@@ -1,0 +1,31 @@
+{
+  "type": "header",
+  "name": "t:general.header",
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "blocks": {
+        "announcement-1": {
+          "type": "announcement",
+          "settings": {
+            "text": "Free shipping on orders over $50",
+            "link": ""
+          }
+        }
+      },
+      "block_order": ["announcement-1"],
+      "settings": {}
+    },
+    "header": {
+      "type": "header",
+      "settings": {
+        "logo_width": 140,
+        "menu": "main-menu",
+        "customer_account_menu": "customer-account-main-menu",
+        "show_localization": true,
+        "sticky": true
+      }
+    }
+  },
+  "order": ["announcement-bar", "header"]
+}

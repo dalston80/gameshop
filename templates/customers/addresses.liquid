@@ -1,0 +1,71 @@
+{{ 'customer.css' | asset_url | stylesheet_tag }}
+
+<div class="customer page-width" data-addresses>
+  <a class="customer__back" href="{{ routes.account_url }}">
+    {% render 'icon', name: 'chevron-left', class: 'icon--small' %}
+    {{ 'customer.addresses.back' | t }}
+  </a>
+
+  <h1 class="customer__title">{{ 'customer.addresses.title' | t }}</h1>
+
+  <details class="customer-address-new" {% if customer.new_address.errors %}open{% endif %}>
+    <summary class="button button--secondary">{{ 'customer.addresses.add_new' | t }}</summary>
+
+    {%- form 'customer_address', customer.new_address, class: 'customer__form customer-address-form', novalidate: 'novalidate' -%}
+      {% render 'customer-form-errors', form: form %}
+      {% render 'customer-address-fields', form: form, id: 'new' %}
+      <button type="submit" class="button">{{ 'customer.addresses.add' | t }}</button>
+    {%- endform -%}
+  </details>
+
+  {%- paginate customer.addresses by 5 -%}
+    {%- if customer.addresses.size > 0 -%}
+      <ul class="customer-address-list" role="list">
+        {%- for address in customer.addresses -%}
+          <li class="customer-address">
+            <div class="customer-address__header">
+              <h2 class="customer__subtitle">
+                {%- if address == customer.default_address -%}
+                  {{ 'customer.addresses.default' | t }}
+                {%- else -%}
+                  {{ 'customer.addresses.address_number' | t: number: forloop.index }}
+                {%- endif -%}
+              </h2>
+            </div>
+
+            <address class="customer__address">{{ address | format_address }}</address>
+
+            <div class="customer-address__actions">
+              <details class="customer-address__edit">
+                <summary class="button button--secondary button--small">
+                  {{ 'customer.addresses.edit' | t }}
+                  <span class="visually-hidden">{{ 'customer.addresses.address_number' | t: number: forloop.index }}</span>
+                </summary>
+                {%- form 'customer_address', address, class: 'customer__form customer-address-form', novalidate: 'novalidate' -%}
+                  {% render 'customer-form-errors', form: form %}
+                  {% render 'customer-address-fields', form: form, id: address.id %}
+                  <button type="submit" class="button">{{ 'customer.addresses.update' | t }}</button>
+                {%- endform -%}
+              </details>
+
+              <form method="post" action="{{ address.url }}" data-confirm="{{ 'customer.addresses.confirm_delete' | t }}">
+                <input type="hidden" name="_method" value="delete">
+                <button type="submit" class="button button--ghost button--small">
+                  {{ 'customer.addresses.delete' | t }}
+                  <span class="visually-hidden">{{ 'customer.addresses.address_number' | t: number: forloop.index }}</span>
+                </button>
+              </form>
+            </div>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      {% render 'content-pagination', paginate: paginate %}
+    {%- else -%}
+      <p class="customer__empty">{{ 'customer.addresses.empty' | t }}</p>
+    {%- endif -%}
+  {%- endpaginate -%}
+</div>
+
+<script src="{{ 'shopify_common.js' | shopify_asset_url }}" defer></script>
+<script src="{{ 'customer-addresses.js' | asset_url }}" defer></script>

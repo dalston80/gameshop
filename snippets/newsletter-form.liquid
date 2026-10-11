@@ -1,0 +1,52 @@
+{% doc %}
+  Renders the newsletter signup form that subscribes the customer to email marketing.
+
+  @param {string} id - Unique id prefix
+
+  @example
+  {% render 'newsletter-form', id: section.id %}
+{% enddoc %}
+
+{%- assign form_id = id | append: '-newsletter' -%}
+{%- form 'customer', id: form_id, class: 'newsletter-form' -%}
+  <input type="hidden" name="contact[tags]" value="newsletter">
+
+  {%- if form.posted_successfully? -%}
+    <p class="form-message form-message--success" role="status" tabindex="-1" autofocus>
+      {{ 'general.newsletter.success' | t }}
+    </p>
+  {%- endif -%}
+
+  {%- if form.errors -%}
+    <div class="form-message form-message--error" role="alert">
+      {{ form.errors | default_errors }}
+    </div>
+  {%- endif -%}
+
+  <label class="visually-hidden" for="{{ id }}-newsletter-email">{{ 'general.newsletter.email_label' | t }}</label>
+  <div class="newsletter-form__field">
+    <input
+      id="{{ id }}-newsletter-email"
+      type="email"
+      name="contact[email]"
+      autocomplete="email"
+      required
+      placeholder="{{ 'general.newsletter.placeholder' | t }}"
+      value="{{ form.email }}"
+      {% if form.errors %}aria-invalid="true"{% endif %}
+    >
+    <button type="submit" class="button">{{ 'general.newsletter.submit' | t }}</button>
+  </div>
+{%- endform -%}
+
+{% stylesheet %}
+  .newsletter-form__field {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .newsletter-form__field input {
+    flex: 1;
+    min-width: 0;
+  }
+{% endstylesheet %}

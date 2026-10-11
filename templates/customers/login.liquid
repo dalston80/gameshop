@@ -1,0 +1,85 @@
+{{ 'customer.css' | asset_url | stylesheet_tag }}
+
+<div class="customer customer--narrow page-width">
+  <h1 class="customer__title">{{ 'customer.login.title' | t }}</h1>
+
+  {%- form 'customer_login', novalidate: 'novalidate', class: 'customer__form' -%}
+    {% render 'customer-form-errors', form: form %}
+
+    <div class="field">
+      <label for="login-email">{{ 'customer.fields.email' | t }}</label>
+      <input
+        id="login-email"
+        type="email"
+        name="customer[email]"
+        value="{{ form.email }}"
+        autocomplete="username"
+        autocapitalize="off"
+        required
+        {% if form.errors contains 'form' %}aria-invalid="true"{% endif %}
+      >
+    </div>
+
+    {%- if form.password_needed -%}
+      <div class="field">
+        <label for="login-password">{{ 'customer.fields.password' | t }}</label>
+        <input
+          id="login-password"
+          type="password"
+          name="customer[password]"
+          autocomplete="current-password"
+          required
+          {% if form.errors contains 'form' %}aria-invalid="true"{% endif %}
+        >
+      </div>
+    {%- endif -%}
+
+    <button type="submit" class="button button--full">{{ 'customer.login.submit' | t }}</button>
+  {%- endform -%}
+
+  {%- form 'recover_customer_password', id: 'recover', class: 'customer__recover' -%}
+    {%- assign recover_posted = false -%}
+    {%- if form.posted_successfully? or form.errors -%}
+      {%- assign recover_posted = true -%}
+    {%- endif -%}
+    <details {% if recover_posted %}open{% endif %}>
+      <summary>{{ 'customer.login.forgot_password' | t }}</summary>
+
+      {%- if form.posted_successfully? -%}
+        <p class="form-message form-message--success" role="status" tabindex="-1" autofocus>
+          {{ 'customer.login.recover_success' | t }}
+        </p>
+      {%- endif -%}
+      {% render 'customer-form-errors', form: form %}
+
+      <p>{{ 'customer.login.recover_text' | t }}</p>
+      <div class="field">
+        <label for="recover-email">{{ 'customer.fields.email' | t }}</label>
+        <input
+          id="recover-email"
+          type="email"
+          name="email"
+          value="{{ form.email }}"
+          autocomplete="email"
+          autocapitalize="off"
+          required
+        >
+      </div>
+      <button type="submit" class="button button--secondary">{{ 'customer.login.recover_submit' | t }}</button>
+    </details>
+  {%- endform -%}
+
+  <p class="customer__alt">
+    {{ 'customer.login.no_account' | t }}
+    <a href="{{ routes.account_register_url }}">{{ 'customer.login.create_account' | t }}</a>
+  </p>
+
+  {%- if shop.checkout.guest_login -%}
+    <div class="customer__guest">
+      <h2 class="customer__subtitle">{{ 'customer.login.guest_title' | t }}</h2>
+      {%- form 'guest_login' -%}
+        <button type="submit" class="button button--secondary button--full">{{ 'customer.login.guest_continue' | t }}</button>
+      {%- endform -%}
+    </div>
+  {%- endif -%}
+</div>

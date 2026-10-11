@@ -1,0 +1,225 @@
+{% doc %}
+  Renders the product option pickers. Options with swatch data render swatches (color or image),
+  other options render pill buttons (radio inputs) or a dropdown. Values with no available variant
+  are crossed out but stay selectable so shoppers can still reach the sold-out variant.
+  Behaviour lives in the <product-form> custom element in assets/product.js.
+
+  @param {product} product - The product
+  @param {string} section_id - The id of the section that renders the picker
+  @param {string} [picker_type] - 'buttons' (default) or 'dropdowns'
+
+  @example
+  {% render 'variant-picker', product: product, section_id: section.id, picker_type: 'buttons' %}
+{% enddoc %}
+
+{%- liquid
+  assign picker_type = picker_type | default: 'buttons'
+-%}
+
+<div class="variant-picker" data-variant-picker>
+  {%- for option in product.options_with_values -%}
+    {%- liquid
+      assign option_number = forloop.index
+      assign has_swatches = false
+      for value in option.values
+        if value.swatch
+          assign has_swatches = true
+          break
+        endif
+      endfor
+    -%}
+
+    {%- if picker_type == 'dropdowns' and has_swatches == false -%}
+      <div class="variant-picker__option">
+        <label for="{{ section_id }}-option-{{ option_number }}">{{ option.name }}</label>
+        <select id="{{ section_id }}-option-{{ option_number }}" name="options[{{ option.name | escape }}]">
+          {%- for value in option.values -%}
+            <option
+              value="{{ value | escape }}"
+              data-option-value-id="{{ value.id }}"
+              data-variant-id="{{ value.variant.id }}"
+              data-media-id="{{ value.variant.featured_media.id }}"
+              {% if value.selected %}
+                selected
+              {% endif %}
+            >
+              {{- value -}}
+              {%- unless value.available %} ({{ 'products.options.unavailable' | t }}){% endunless -%}
+            </option>
+          {%- endfor -%}
+        </select>
+      </div>
+    {%- else -%}
+      <fieldset class="variant-picker__option">
+        <legend class="label">
+          {{- option.name }}:
+          <span class="variant-picker__selected">{{ option.selected_value }}</span>
+        </legend>
+        <div class="variant-picker__values">
+          {%- for value in option.values -%}
+            {%- assign input_id = section_id | append: '-option-' | append: option_number | append: '-' | append: value.id -%}
+            <div class="variant-picker__value">
+              <input
+                type="radio"
+                class="variant-picker__input visually-hidden"
+                id="{{ input_id }}"
+                name="{{ section_id }}-option-{{ option_number }}"
+                value="{{ value | escape }}"
+                data-option-value-id="{{ value.id }}"
+                data-variant-id="{{ value.variant.id }}"
+                data-media-id="{{ value.variant.featured_media.id }}"
+                {% if value.selected %}
+                  checked
+                {% endif %}
+              >
+              {%- if value.swatch -%}
+                <label
+                  for="{{ input_id }}"
+                  class="variant-picker__swatch{% unless value.available %} is-unavailable{% endunless %}"
+                  title="{{ value | escape }}"
+                >
+                  {%- if value.swatch.image -%}
+                    {{ value.swatch.image | image_url: width: 96 | image_tag: width: 48, height: 48, loading: 'lazy', alt: '' }}
+                  {%- else -%}
+                    <span class="variant-picker__swatch-color" style="--swatch-color: {{ value.swatch.color }}"></span>
+                  {%- endif -%}
+                  <span class="visually-hidden">
+                    {{- value -}}
+                    {%- unless value.available %} ({{ 'products.options.unavailable' | t }}){% endunless -%}
+                  </span>
+                </label>
+              {%- else -%}
+                <label for="{{ input_id }}" class="variant-picker__pill{% unless value.available %} is-unavailable{% endunless %}">
+                  {{- value -}}
+                  {%- unless value.available %}
+                    <span class="visually-hidden">({{ 'products.options.unavailable' | t }})</span>
+                  {%- endunless -%}
+                </label>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      </fieldset>
+    {%- endif -%}
+  {%- endfor -%}
+</div>
+
+{% stylesheet %}
+  .variant-picker {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .variant-picker__option {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .variant-picker__option legend {
+    padding: 0;
+  }
+
+  .variant-picker__selected {
+    font-weight: var(--font-body-weight);
+    color: var(--color-text-muted);
+  }
+
+  .variant-picker__values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .variant-picker__value {
+    position: relative;
+  }
+
+  .variant-picker__pill,
+  .variant-picker__swatch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    margin: 0;
+    overflow: hidden;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-background);
+    color: var(--color-text);
+    font-weight: var(--font-body-weight);
+    cursor: pointer;
+  }
+
+  .variant-picker__pill {
+    padding: 0.375rem 1rem;
+  }
+
+  .variant-picker__swatch {
+    padding: 0.25rem;
+    border-radius: 50%;
+  }
+
+  .variant-picker__swatch img,
+  .variant-picker__swatch-color {
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .variant-picker__swatch-color {
+    display: block;
+    background: var(--swatch-color, transparent);
+  }
+
+  .variant-picker__pill:hover,
+  .variant-picker__swatch:hover {
+    border-color: var(--color-primary);
+  }
+
+  .variant-picker__input:checked + .variant-picker__pill {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  .variant-picker__input:checked + .variant-picker__swatch {
+    border-color: var(--color-primary);
+    box-shadow: inset 0 0 0 2px var(--color-background);
+  }
+
+  .variant-picker__input:focus-visible + label {
+    outline: 3px solid var(--color-text);
+    outline-offset: 2px;
+  }
+
+  .variant-picker__pill.is-unavailable,
+  .variant-picker__swatch.is-unavailable {
+    color: var(--color-text-muted);
+  }
+
+  .variant-picker__pill.is-unavailable::after,
+  .variant-picker__swatch.is-unavailable::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top right,
+      transparent calc(50% - 1px),
+      currentColor calc(50% - 1px),
+      currentColor calc(50% + 1px),
+      transparent calc(50% + 1px)
+    );
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .variant-picker__input:checked + .variant-picker__pill.is-unavailable {
+    color: var(--color-on-primary);
+  }
+{% endstylesheet %}

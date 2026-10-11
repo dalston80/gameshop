@@ -1,0 +1,43 @@
+<div
+  class="main-page section page-width"
+  style="--section-padding-top: {{ section.settings.padding_top }}px; --section-padding-bottom: {{ section.settings.padding_bottom }}px;"
+>
+  <h1 class="main-page__title">{{ page.title | escape }}</h1>
+  <div class="main-page__content rte">
+    {{ page.content }}
+  </div>
+</div>
+
+{% stylesheet %}
+  .main-page {
+    max-width: calc(52rem + var(--page-margin) * 2);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.main_page.name",
+  "settings": [
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding_top",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding_bottom",
+      "default": 32
+    }
+  ]
+}
+{% endschema %}

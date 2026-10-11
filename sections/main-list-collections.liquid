@@ -1,0 +1,201 @@
+{%- liquid
+  assign columns = section.settings.columns_desktop
+  assign columns_mobile = section.settings.columns_mobile | plus: 0
+  assign tablet_columns = columns | at_most: 3
+  assign tablet_size = 100 | divided_by: tablet_columns
+  assign desktop_size = 100 | divided_by: columns
+  assign mobile_size = 100 | divided_by: columns_mobile
+  assign card_sizes = '(min-width: 990px) ' | append: desktop_size | append: 'vw, (min-width: 750px) ' | append: tablet_size | append: 'vw, ' | append: mobile_size | append: 'vw'
+-%}
+
+<div
+  class="section collection-list page-width"
+  style="--section-padding-top: {{ section.settings.padding_top }}px; --section-padding-bottom: {{ section.settings.padding_bottom }}px;"
+>
+  <h1 class="section-heading section-heading--start">{{ 'collections.list.title' | t }}</h1>
+
+  {%- paginate collections by section.settings.collections_per_page -%}
+    {%- if collections.size > 0 -%}
+      <ul
+        class="collection-list__grid"
+        role="list"
+        style="--grid-columns: {{ columns }}; --grid-columns-tablet: {{ tablet_columns }}; --grid-columns-mobile: {{ columns_mobile }};"
+      >
+        {%- for collection in collections -%}
+          <li>
+            <article class="collection-card">
+              <a class="collection-card__media media" href="{{ collection.url }}" tabindex="-1" aria-hidden="true">
+                {%- if collection.featured_image -%}
+                  {%- assign card_alt = collection.featured_image.alt | default: collection.title -%}
+                  {%- assign card_focal_style = 'object-position: ' | append: collection.featured_image.presentation.focal_point -%}
+                  {{
+                    collection.featured_image
+                    | image_url: width: 800
+                    | image_tag:
+                      widths: '300, 400, 600, 800',
+                      sizes: card_sizes,
+                      loading: 'lazy',
+                      alt: card_alt,
+                      style: card_focal_style
+                  }}
+                {%- else -%}
+                  {{ 'collection-1' | placeholder_svg_tag: 'placeholder-svg' }}
+                {%- endif -%}
+              </a>
+              <div class="collection-card__body">
+                <h2 class="collection-card__title">
+                  <a href="{{ collection.url }}">{{ collection.title }}</a>
+                </h2>
+                {%- if section.settings.show_product_count -%}
+                  <p class="collection-card__count">{{ 'collections.list.product_count' | t: count: collection.products_count }}</p>
+                {%- endif -%}
+              </div>
+            </article>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      {% render 'content-pagination', paginate: paginate %}
+    {%- else -%}
+      <div class="empty-state">
+        <p>{{ 'collections.list.empty' | t }}</p>
+        <a class="button" href="{{ routes.root_url }}">{{ 'cart.general.continue_shopping' | t }}</a>
+      </div>
+    {%- endif -%}
+  {%- endpaginate -%}
+</div>
+
+{% stylesheet %}
+  .collection-list__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-columns-mobile), minmax(0, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .collection-card {
+    position: relative;
+    height: 100%;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-background);
+    overflow: hidden;
+  }
+
+  .collection-card:hover,
+  .collection-card:focus-within {
+    border-color: var(--color-accent-text);
+  }
+
+  .collection-card__media {
+    aspect-ratio: 4 / 3;
+  }
+
+  .collection-card__body {
+    padding: 0.75rem;
+  }
+
+  .collection-card__title {
+    margin: 0;
+    font-size: 1.125rem;
+    overflow-wrap: break-word;
+  }
+
+  .collection-card__title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .collection-card__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .collection-card__title a:hover {
+    text-decoration: underline;
+  }
+
+  .collection-card__count {
+    margin: 0.25rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  @media (min-width: 750px) {
+    .collection-list__grid {
+      grid-template-columns: repeat(var(--grid-columns-tablet), minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+  }
+
+  @media (min-width: 990px) {
+    .collection-list__grid {
+      grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.main_list_collections.name",
+  "settings": [
+    {
+      "type": "range",
+      "id": "collections_per_page",
+      "label": "t:sections.main_list_collections.settings.collections_per_page.label",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "t:sections.main_list_collections.settings.columns_desktop.label",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "t:sections.main_list_collections.settings.columns_mobile.label",
+      "options": [
+        { "value": "1", "label": "t:sections.main_list_collections.settings.columns_mobile.options__1" },
+        { "value": "2", "label": "t:sections.main_list_collections.settings.columns_mobile.options__2" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "t:sections.main_list_collections.settings.show_product_count.label",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "t:sections.main_list_collections.settings.padding_top.label",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "t:sections.main_list_collections.settings.padding_bottom.label",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    }
+  ]
+}
+{% endschema %}

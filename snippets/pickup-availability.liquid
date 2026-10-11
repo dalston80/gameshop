@@ -1,0 +1,177 @@
+{% doc %}
+  Renders local pickup availability for a variant: a one-line summary and a dialog that lists every pickup location.
+  Renders nothing when the variant has no pickup locations.
+
+  @param {variant} variant - The variant to show pickup availability for
+  @param {string} section_id - The id of the section that renders it (keeps dialog ids unique)
+
+  @example
+  {% render 'pickup-availability', variant: current_variant, section_id: section.id %}
+{% enddoc %}
+
+{%- liquid
+  assign availabilities = variant.store_availabilities
+  assign summary_availability = availabilities | where: 'available', true | first
+  assign summary_availability = summary_availability | default: availabilities.first
+  assign dialog_id = 'pickup-' | append: section_id
+-%}
+
+{%- if availabilities.size > 0 and summary_availability -%}
+  <div class="pickup-availability">
+    <p class="pickup-availability__summary">
+      {%- if summary_availability.available -%}
+        {% render 'icon', name: 'check', class: 'icon--small pickup-availability__icon' %}
+        <span>
+          {{- 'products.pickup.available_at' | t: location: summary_availability.location.name -}}
+          {%- if summary_availability.pick_up_time != blank %}
+            <span class="pickup-availability__time">{{ summary_availability.pick_up_time }}</span>
+          {%- endif -%}
+        </span>
+      {%- else -%}
+        <span>{{ 'products.pickup.unavailable_at' | t: location: summary_availability.location.name }}</span>
+      {%- endif -%}
+    </p>
+
+    <button type="button" class="pickup-availability__link" data-dialog-open="{{ dialog_id }}">
+      {{ 'products.pickup.view_stores' | t }}
+    </button>
+
+    <dialog-element id="{{ dialog_id }}">
+      <dialog class="pickup-dialog" aria-labelledby="{{ dialog_id }}-title">
+        <div class="pickup-dialog__header">
+          <h2 class="pickup-dialog__title" id="{{ dialog_id }}-title">
+            {{ 'products.pickup.dialog_title' | t }}
+          </h2>
+          <button type="button" class="icon-button" data-dialog-close aria-label="{{ 'products.pickup.close' | t }}">
+            {% render 'icon', name: 'close' %}
+          </button>
+        </div>
+        <p class="pickup-dialog__product">
+          {{- variant.product.title -}}
+          {%- unless variant.product.has_only_default_variant %} &ndash; {{ variant.title }}{% endunless -%}
+        </p>
+        <ul class="pickup-dialog__list" role="list">
+          {%- for availability in availabilities -%}
+            <li class="pickup-dialog__location">
+              <h3 class="pickup-dialog__name">{{ availability.location.name }}</h3>
+              <p class="pickup-dialog__status{% if availability.available %} is-available{% endif %}">
+                {%- if availability.available -%}
+                  {{ 'products.pickup.available' | t }}
+                  {%- if availability.pick_up_time != blank %}, {{ availability.pick_up_time | downcase }}{% endif -%}
+                {%- else -%}
+                  {{ 'products.pickup.unavailable' | t }}
+                {%- endif -%}
+              </p>
+              <address class="pickup-dialog__address">
+                {{ availability.location.address | format_address }}
+                {%- if availability.location.address.phone != blank -%}
+                  <br>
+                  <a href="tel:{{ availability.location.address.phone | escape }}">{{ availability.location.address.phone }}</a>
+                {%- endif -%}
+              </address>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </dialog>
+    </dialog-element>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .pickup-availability {
+    margin-top: 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .pickup-availability__summary {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin: 0 0 0.25rem;
+  }
+
+  .pickup-availability__icon {
+    margin-top: 0.25rem;
+    color: var(--color-accent-text);
+  }
+
+  .pickup-availability__time {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+  }
+
+  .pickup-availability__link {
+    padding: 0.5rem 0;
+    border: 0;
+    background: none;
+    color: var(--color-primary);
+    font: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+    cursor: pointer;
+  }
+
+  .pickup-dialog {
+    width: min(32rem, calc(100vw - 2rem));
+    max-height: calc(100dvh - 2rem);
+    padding: 1.25rem;
+    overflow-y: auto;
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--color-background);
+    color: var(--color-text);
+  }
+
+  .pickup-dialog::backdrop {
+    background: rgb(0 0 0 / 0.5);
+  }
+
+  .pickup-dialog__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .pickup-dialog__title {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .pickup-dialog__product {
+    margin: 0.25rem 0 1rem;
+    color: var(--color-text-muted);
+  }
+
+  .pickup-dialog__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pickup-dialog__location {
+    padding: 1rem 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .pickup-dialog__name {
+    margin: 0 0 0.25rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+  }
+
+  .pickup-dialog__status {
+    margin: 0 0 0.5rem;
+    color: var(--color-text-muted);
+  }
+
+  .pickup-dialog__status.is-available {
+    color: var(--color-accent-text);
+    font-weight: var(--font-body-weight-bold);
+  }
+
+  .pickup-dialog__address {
+    font-style: normal;
+  }
+{% endstylesheet %}

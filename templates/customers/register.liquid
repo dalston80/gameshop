@@ -1,0 +1,65 @@
+{{ 'customer.css' | asset_url | stylesheet_tag }}
+
+<div class="customer customer--narrow page-width">
+  <h1 class="customer__title">{{ 'customer.register.title' | t }}</h1>
+
+  {%- form 'create_customer', novalidate: 'novalidate', class: 'customer__form' -%}
+    {% render 'customer-form-errors', form: form %}
+
+    <div class="customer__row">
+      <div class="field">
+        <label for="register-first-name">{{ 'customer.fields.first_name' | t }}</label>
+        <input
+          id="register-first-name"
+          type="text"
+          name="customer[first_name]"
+          value="{{ form.first_name }}"
+          autocomplete="given-name"
+        >
+      </div>
+      <div class="field">
+        <label for="register-last-name">{{ 'customer.fields.last_name' | t }}</label>
+        <input
+          id="register-last-name"
+          type="text"
+          name="customer[last_name]"
+          value="{{ form.last_name }}"
+          autocomplete="family-name"
+        >
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="register-email">{{ 'customer.fields.email' | t }}</label>
+      <input
+        id="register-email"
+        type="email"
+        name="customer[email]"
+        value="{{ form.email }}"
+        autocomplete="email"
+        autocapitalize="off"
+        required
+        {% if form.errors contains 'email' %}aria-invalid="true"{% endif %}
+      >
+    </div>
+
+    <div class="field">
+      <label for="register-password">{{ 'customer.fields.password' | t }}</label>
+      <input
+        id="register-password"
+        type="password"
+        name="customer[password]"
+        autocomplete="new-password"
+        required
+        {% if form.errors contains 'password' %}aria-invalid="true"{% endif %}
+      >
+    </div>
+
+    <button type="submit" class="button button--full">{{ 'customer.register.submit' | t }}</button>
+  {%- endform -%}
+
+  <p class="customer__alt">
+    {{ 'customer.register.have_account' | t }}
+    <a href="{{ routes.account_login_url }}">{{ 'customer.register.sign_in' | t }}</a>
+  </p>
+</div>

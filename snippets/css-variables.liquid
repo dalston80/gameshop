@@ -1,0 +1,48 @@
+{% doc %}
+  Renders the theme's design tokens as CSS custom properties and loads the merchant-selected fonts.
+{% enddoc %}
+
+{%- liquid
+  assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
+-%}
+
+{% style %}
+  {{ settings.type_heading_font | font_face: font_display: 'swap' }}
+  {{ settings.type_body_font | font_face: font_display: 'swap' }}
+  {{ body_font_bold | font_face: font_display: 'swap' }}
+  {{ settings.type_body_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
+
+  :root {
+    --font-heading: {{ settings.type_heading_font.family }}, {{ settings.type_heading_font.fallback_families }};
+    --font-heading-weight: {{ settings.type_heading_font.weight }};
+    --font-heading-style: {{ settings.type_heading_font.style }};
+    --font-body: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    --font-body-weight: {{ settings.type_body_font.weight }};
+    --font-body-weight-bold: {{ body_font_bold.weight }};
+    --font-body-style: {{ settings.type_body_font.style }};
+
+    --color-primary: {{ settings.color_primary }};
+    --color-on-primary: {% if settings.color_primary.lightness > 50 %}#101820{% else %}#ffffff{% endif %};
+    --color-accent: {{ settings.color_accent }};
+    --color-on-accent: {% if settings.color_accent.lightness > 40 %}#04241C{% else %}#ffffff{% endif %};
+    --color-accent-text: {{ settings.color_accent_text }};
+    --color-soft: {{ settings.color_soft }};
+    --color-on-soft: {% if settings.color_soft.lightness > 40 %}#101820{% else %}#ffffff{% endif %};
+    --color-background: {{ settings.color_background }};
+    --color-text: {{ settings.color_text }};
+    --color-text-muted: {{ settings.color_text_muted }};
+    --color-border: {{ settings.color_border }};
+    --color-sale: {{ settings.color_sale }};
+    --color-rating: {{ settings.color_rating }};
+
+    --platform-1-color: {{ settings.platform_1_color }};
+    --platform-2-color: {{ settings.platform_2_color }};
+    --platform-3-color: {{ settings.platform_3_color }};
+    --platform-4-color: {{ settings.platform_4_color }};
+
+    --page-width: {{ settings.page_width }};
+    --page-margin: {{ settings.page_margin }}px;
+    --radius: {{ settings.corner_radius }}px;
+    --card-image-ratio: {{ settings.card_image_ratio }};
+  }
+{% endstyle %}

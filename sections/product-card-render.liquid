@@ -1,0 +1,12 @@
+{% comment %}
+  Renders a single product card for the product.card alternate template. Client-side code (the recently viewed
+  section) fetches it through the Section Rendering API.
+{% endcomment %}
+
+{% render 'product-card', product: product, id_prefix: 'recent' %}
+
+{% schema %}
+{
+  "name": "t:sections.product_card_render.name"
+}
+{% endschema %}

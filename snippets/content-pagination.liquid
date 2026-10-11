@@ -1,0 +1,43 @@
+{% doc %}
+  Renders numbered pagination links from the `paginate` object, styled by `.pagination` in base.css.
+
+  @param {object} paginate - The paginate object from a `paginate` tag
+  @param {string} [anchor] - Optional fragment (e.g. '#comments') appended to every link
+
+  @example
+  {% render 'content-pagination', paginate: paginate %}
+{% enddoc %}
+
+{%- if paginate.pages > 1 -%}
+  <nav aria-label="{{ 'general.pagination.label' | t }}">
+    <ul class="pagination" role="list">
+      {%- if paginate.previous -%}
+        <li>
+          <a href="{{ paginate.previous.url }}{{ anchor }}" aria-label="{{ 'general.pagination.previous' | t }}">
+            {% render 'icon', name: 'chevron-left', class: 'icon--small' %}
+          </a>
+        </li>
+      {%- endif -%}
+
+      {%- for part in paginate.parts -%}
+        <li>
+          {%- if part.is_link -%}
+            <a href="{{ part.url }}{{ anchor }}" aria-label="{{ 'general.pagination.page' | t: number: part.title }}">{{ part.title }}</a>
+          {%- elsif part.title == paginate.current_page -%}
+            <span class="pagination__current" aria-current="page">{{ part.title }}</span>
+          {%- else -%}
+            <span aria-hidden="true">{{ part.title }}</span>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+
+      {%- if paginate.next -%}
+        <li>
+          <a href="{{ paginate.next.url }}{{ anchor }}" aria-label="{{ 'general.pagination.next' | t }}">
+            {% render 'icon', name: 'chevron-right', class: 'icon--small' %}
+          </a>
+        </li>
+      {%- endif -%}
+    </ul>
+  </nav>
+{%- endif -%}

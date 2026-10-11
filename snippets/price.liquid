@@ -1,0 +1,52 @@
+{% doc %}
+  Renders a product price: current, compare-at, range when variants differ, and unit price.
+
+  @param {product} product - The product
+  @param {variant} [variant] - Specific variant. Defaults to the product's price range.
+  @param {string} [class] - Extra classes
+
+  @example
+  {% render 'price', product: product, variant: current_variant %}
+{% enddoc %}
+
+{%- liquid
+  if variant
+    assign current = variant.price
+    assign compare = variant.compare_at_price
+    assign varies = false
+    assign unit_price = variant.unit_price
+    assign unit_measurement = variant.unit_price_measurement
+  else
+    assign current = product.price
+    assign compare = product.compare_at_price
+    assign varies = product.price_varies
+    assign unit_price = product.selected_or_first_available_variant.unit_price
+    assign unit_measurement = product.selected_or_first_available_variant.unit_price_measurement
+  endif
+
+  assign on_sale = false
+  if compare > current
+    assign on_sale = true
+  endif
+-%}
+
+<div class="price {% if on_sale %}price--sale{% endif %} {{ class }}" data-price>
+  <span class="visually-hidden">{{ 'products.price.regular' | t }}</span>
+  <span class="price__current">
+    {%- if varies and variant == blank -%}
+      {%- assign price_min = product.price_min | money -%}
+      {{ 'products.price.from' | t: price: price_min }}
+    {%- else -%}
+      {{ current | money }}
+    {%- endif -%}
+  </span>
+  {%- if on_sale -%}
+    <span class="visually-hidden">{{ 'products.price.sale_label' | t }}</span>
+    <s class="price__compare">{{ compare | money }}</s>
+  {%- endif -%}
+  {%- if unit_price != blank -%}
+    <span class="price__unit">
+      {{ unit_price | money }} / {% if unit_measurement.reference_value != 1 %}{{ unit_measurement.reference_value }}{% endif %}{{ unit_measurement.reference_unit }}
+    </span>
+  {%- endif -%}
+</div>

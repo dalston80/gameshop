@@ -1,0 +1,70 @@
+<div
+  class="main-404 section page-width"
+  style="--section-padding-top: {{ section.settings.padding_top }}px; --section-padding-bottom: {{ section.settings.padding_bottom }}px;"
+>
+  <div class="main-404__inner">
+    <p class="main-404__code" aria-hidden="true">404</p>
+    <h1 class="main-404__title">{{ 'errors.not_found.title' | t }}</h1>
+    <p class="main-404__text">{{ 'errors.not_found.text' | t }}</p>
+
+    <div class="main-404__search">
+      {% render 'search-form', id: 'not-found-search' %}
+    </div>
+
+    <a class="button" href="{{ routes.root_url }}">{{ 'cart.general.continue_shopping' | t }}</a>
+  </div>
+</div>
+
+{% stylesheet %}
+  .main-404__inner {
+    max-width: 32rem;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .main-404__code {
+    margin: 0;
+    color: var(--color-accent-text);
+    font-family: var(--font-heading);
+    font-size: 4rem;
+    font-weight: var(--font-heading-weight);
+    line-height: 1;
+  }
+
+  .main-404__search {
+    margin-block: 1.5rem;
+    text-align: start;
+  }
+
+  .main-404__search .search-form__field input[type='search'] {
+    border-color: var(--color-text-muted);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.main_404.name",
+  "settings": [
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding_top",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.all.padding_bottom",
+      "default": 48
+    }
+  ]
+}
+{% endschema %}

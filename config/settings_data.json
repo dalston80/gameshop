@@ -1,1 +1,52 @@
-{}
+{
+  "current": {
+    "color_primary": "#087287",
+    "color_accent": "#0BE0A7",
+    "color_accent_text": "#067F5E",
+    "color_soft": "#CDEFE5",
+    "color_background": "#FFFFFF",
+    "color_text": "#101820",
+    "color_text_muted": "#4A5A60",
+    "color_border": "#CFE3E0",
+    "color_sale": "#C80000",
+    "color_rating": "#F5B800",
+    "platform_1_name": "PlayStation",
+    "platform_1_tag": "playstation",
+    "platform_1_color": "#0A3FB5",
+    "platform_2_name": "Xbox",
+    "platform_2_tag": "xbox",
+    "platform_2_color": "#107C10",
+    "platform_3_name": "Nintendo",
+    "platform_3_tag": "nintendo",
+    "platform_3_color": "#C4001A",
+    "platform_4_name": "PC",
+    "platform_4_tag": "pc",
+    "platform_4_color": "#B34700",
+    "type_heading_font": "nunito_sans_n7",
+    "type_body_font": "nunito_sans_n4",
+    "page_width": "90rem",
+    "page_margin": 20,
+    "corner_radius": 4,
+    "card_image_ratio": "4 / 5",
+    "card_show_vendor": false,
+    "card_show_rating": true,
+    "card_show_platform": true,
+    "card_show_quick_add": true,
+    "cart_type": "drawer",
+    "cart_show_note": true,
+    "predictive_search_limit": 4
+  },
+  "presets": {
+    "GameShop": {
+      "color_primary": "#087287",
+      "color_accent": "#0BE0A7",
+      "color_accent_text": "#067F5E",
+      "color_soft": "#CDEFE5",
+      "type_heading_font": "nunito_sans_n7",
+      "type_body_font": "nunito_sans_n4",
+      "page_width": "90rem",
+      "card_image_ratio": "4 / 5",
+      "cart_type": "drawer"
+    }
+  }
+}

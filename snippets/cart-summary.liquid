@@ -1,0 +1,99 @@
+{% doc %}
+  Renders the cart totals, discount list, tax note, notes field and checkout button.
+  The checkout button submits the cart form with name="checkout".
+
+  @param {object} cart - The cart object
+  @param {string} form_id - Id of the cart form this summary belongs to
+  @param {boolean} [show_additional_buttons] - Render accelerated checkout buttons (Shop Pay, Apple Pay, etc.)
+
+  @example
+  {% render 'cart-summary', cart: cart, form_id: 'cart-form', show_additional_buttons: true %}
+{% enddoc %}
+
+<div class="cart-summary">
+  {%- if cart.cart_level_discount_applications.size > 0 -%}
+    <ul class="cart-summary__discounts" role="list">
+      {%- for discount in cart.cart_level_discount_applications -%}
+        <li>
+          {% render 'icon', name: 'check', class: 'icon--small' %}
+          {{ discount.title }} (-{{ discount.total_allocated_amount | money }})
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+
+  <p class="cart-summary__total">
+    <span>{{ 'cart.general.subtotal' | t }}</span>
+    <span class="price__current">{{ cart.total_price | money_with_currency }}</span>
+  </p>
+
+  {%- if cart.total_discounts > 0 -%}
+    {%- assign saved_amount = cart.total_discounts | money -%}
+    <p class="cart-summary__saved">{{ 'cart.general.you_saved' | t: amount: saved_amount }}</p>
+  {%- endif -%}
+
+  <p class="cart-summary__tax">
+    {%- if cart.taxes_included and shop.shipping_policy.body != blank -%}
+      {{ 'cart.general.taxes_included_shipping_at_checkout_with_policy_html' | t: link: shop.shipping_policy.url }}
+    {%- elsif cart.taxes_included -%}
+      {{ 'cart.general.taxes_included_shipping_at_checkout' | t }}
+    {%- elsif shop.shipping_policy.body != blank -%}
+      {{ 'cart.general.taxes_shipping_at_checkout_with_policy_html' | t: link: shop.shipping_policy.url }}
+    {%- else -%}
+      {{ 'cart.general.taxes_shipping_at_checkout' | t }}
+    {%- endif -%}
+  </p>
+
+  <button type="submit" name="checkout" form="{{ form_id }}" class="button button--full" {% if cart.item_count == 0 %}disabled{% endif %}>
+    {{ 'cart.general.checkout' | t }}
+  </button>
+
+  {%- if show_additional_buttons and additional_checkout_buttons -%}
+    <div class="cart-summary__accelerated">
+      {{ content_for_additional_checkout_buttons }}
+    </div>
+  {%- endif -%}
+</div>
+
+{% stylesheet %}
+  .cart-summary {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .cart-summary p {
+    margin: 0;
+  }
+
+  .cart-summary__discounts {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    color: var(--color-accent-text);
+    font-size: 0.9375rem;
+    list-style: none;
+  }
+
+  .cart-summary__discounts li {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .cart-summary__total {
+    display: flex;
+    justify-content: space-between;
+    font-weight: var(--font-body-weight-bold);
+  }
+
+  .cart-summary__saved {
+    color: var(--color-accent-text);
+    font-size: 0.9375rem;
+  }
+
+  .cart-summary__tax {
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+  }
+{% endstylesheet %}

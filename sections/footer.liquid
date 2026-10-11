@@ -1,0 +1,278 @@
+{%- liquid
+  assign social_links = false
+  if settings.social_facebook != blank or settings.social_x != blank or settings.social_instagram != blank or settings.social_youtube != blank or settings.social_tiktok != blank or settings.social_twitch != blank
+    assign social_links = true
+  endif
+-%}
+
+<footer class="site-footer">
+  <div class="page-width site-footer__inner">
+    <div class="site-footer__columns">
+      {%- for block in section.blocks -%}
+        <div class="site-footer__column" {{ block.shopify_attributes }}>
+          {%- case block.type -%}
+            {%- when 'link_list' -%}
+              {%- if block.settings.heading != blank -%}
+                <h2 class="site-footer__heading">{{ block.settings.heading }}</h2>
+              {%- endif -%}
+              <ul class="site-footer__links">
+                {%- for link in block.settings.menu.links -%}
+                  <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                {%- endfor -%}
+              </ul>
+            {%- when 'text' -%}
+              {%- if block.settings.heading != blank -%}
+                <h2 class="site-footer__heading">{{ block.settings.heading }}</h2>
+              {%- endif -%}
+              <div class="rte">{{ block.settings.text }}</div>
+          {%- endcase -%}
+        </div>
+      {%- endfor -%}
+
+      {%- if section.settings.show_newsletter or social_links or section.settings.show_follow_on_shop -%}
+        <div class="site-footer__column site-footer__column--wide">
+          {%- if section.settings.show_newsletter -%}
+            <h2 class="site-footer__heading">{{ section.settings.newsletter_heading }}</h2>
+            {%- if section.settings.newsletter_text != blank -%}
+              <p>{{ section.settings.newsletter_text }}</p>
+            {%- endif -%}
+            {% render 'newsletter-form', id: section.id %}
+          {%- endif -%}
+
+          {%- if social_links -%}
+            <h2 class="site-footer__heading site-footer__heading--spaced">{{ 'general.social.follow_us' | t }}</h2>
+            <ul class="social-links">
+              {%- assign networks = 'facebook,x,instagram,youtube,tiktok,twitch' | split: ',' -%}
+              {%- for network in networks -%}
+                {%- assign setting_key = 'social_' | append: network -%}
+                {%- assign network_label_key = 'general.social.' | append: network -%}
+                {%- if settings[setting_key] != blank -%}
+                  <li>
+                    <a href="{{ settings[setting_key] }}" rel="noopener" target="_blank">
+                      {% render 'icon', name: network %}
+                      <span class="visually-hidden">{{ network_label_key | t }} {{ 'general.accessibility.opens_new_window' | t }}</span>
+                    </a>
+                  </li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+
+          {%- if section.settings.show_follow_on_shop and shop.features.follow_on_shop? -%}
+            <div class="site-footer__follow">{{ shop | login_button: action: 'follow' }}</div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="site-footer__bottom">
+      <p class="site-footer__copyright">
+        &copy; {{ 'now' | date: '%Y' }} {{ shop.name | link_to: routes.root_url }}
+        <span class="site-footer__powered">{{ powered_by_link }}</span>
+      </p>
+
+      {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
+        <ul class="site-footer__payment" role="list" aria-label="{{ 'general.footer.payment_methods' | t }}">
+          {%- for type in shop.enabled_payment_types -%}
+            <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+
+{% stylesheet %}
+  .site-footer {
+    margin-top: 3rem;
+    background: var(--color-soft);
+    color: var(--color-on-soft);
+  }
+
+  .site-footer a {
+    color: inherit;
+  }
+
+  .site-footer__inner {
+    padding-block: 2.5rem 1.5rem;
+  }
+
+  .site-footer__columns {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-footer__column--wide {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 750px) {
+    .site-footer__columns {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .site-footer__column--wide {
+      grid-column: span 2;
+    }
+  }
+
+  .site-footer__heading {
+    margin-bottom: 0.75rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: var(--font-body-weight-bold);
+  }
+
+  .site-footer__heading--spaced {
+    margin-top: 1.5rem;
+  }
+
+  .site-footer__links {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-footer__links a {
+    display: inline-block;
+    padding-block: 0.25rem;
+  }
+
+  .social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .social-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  .site-footer__follow {
+    margin-top: 1rem;
+  }
+
+  .site-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgb(0 0 0 / 0.15);
+    font-size: 0.875rem;
+  }
+
+  .site-footer__copyright {
+    margin: 0;
+  }
+
+  .site-footer__payment {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .payment-icon {
+    width: 2.375rem;
+    height: 1.5rem;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.footer.name",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.footer.settings.header_newsletter"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "t:sections.footer.settings.show_newsletter.label",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "t:sections.footer.settings.newsletter_heading.label",
+      "default": "Newsletter"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_text",
+      "label": "t:sections.footer.settings.newsletter_text.label",
+      "default": "Be the first to know about new releases, discounts and more."
+    },
+    {
+      "type": "header",
+      "content": "t:sections.footer.settings.header_extras"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_follow_on_shop",
+      "label": "t:sections.footer.settings.show_follow_on_shop.label",
+      "info": "t:sections.footer.settings.show_follow_on_shop.info",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "t:sections.footer.settings.show_payment_icons.label",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "link_list",
+      "name": "t:sections.footer.blocks.link_list.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:sections.footer.blocks.link_list.settings.heading.label",
+          "default": "Need help?"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "t:sections.footer.blocks.link_list.settings.menu.label",
+          "default": "footer"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "t:sections.footer.blocks.text.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:sections.footer.blocks.text.settings.heading.label",
+          "default": "About us"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "t:sections.footer.blocks.text.settings.text.label",
+          "default": "<p>Tell customers about your store.</p>"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6
+}
+{% endschema %}

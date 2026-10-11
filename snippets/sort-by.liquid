@@ -1,0 +1,65 @@
+{% doc %}
+  Renders the "Sort by" select for a collection or search results page. The form carries the active search
+  terms and filters as hidden inputs so changing the sort order keeps them.
+
+  @param {object} results - The `collection` or `search` object (must expose `sort_options` and `filters`)
+  @param {string} url - The URL the form submits to (collection.url or routes.search_url)
+  @param {string} id - Unique id prefix for this instance
+
+  @example
+  {% render 'sort-by', results: collection, url: collection.url, id: 'collection-sort' %}
+{% enddoc %}
+
+{%- liquid
+  assign current_sort = results.sort_by | default: results.default_sort_by
+-%}
+
+<form class="sort-by" method="get" action="{{ url }}" data-facets-sort-form>
+  {%- if search.performed -%}
+    <input type="hidden" name="q" value="{{ search.terms | escape }}">
+  {%- endif -%}
+
+  {%- for filter in results.filters -%}
+    {%- if filter.type == 'price_range' -%}
+      {%- if filter.min_value.value != blank -%}
+        <input type="hidden" name="{{ filter.min_value.param_name }}" value="{{ filter.min_value.value | divided_by: 100.0 | round: 2 }}">
+      {%- endif -%}
+      {%- if filter.max_value.value != blank -%}
+        <input type="hidden" name="{{ filter.max_value.param_name }}" value="{{ filter.max_value.value | divided_by: 100.0 | round: 2 }}">
+      {%- endif -%}
+    {%- else -%}
+      {%- for value in filter.active_values -%}
+        <input type="hidden" name="{{ value.param_name }}" value="{{ value.value | escape }}">
+      {%- endfor -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  <label class="sort-by__label" for="{{ id }}">{{ 'facets.sort_by' | t }}</label>
+  <select id="{{ id }}" name="sort_by" data-auto-submit data-facets-sort>
+    {%- for option in results.sort_options -%}
+      <option value="{{ option.value }}"{% if option.value == current_sort %} selected{% endif %}>{{ option.name }}</option>
+    {%- endfor -%}
+  </select>
+  <noscript>
+    <button type="submit" class="button button--small">{{ 'facets.apply' | t }}</button>
+  </noscript>
+</form>
+
+{% stylesheet %}
+  .sort-by {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .sort-by__label {
+    margin: 0;
+    font-weight: var(--font-body-weight);
+    white-space: nowrap;
+  }
+
+  .sort-by select {
+    width: auto;
+    min-width: 10rem;
+  }
+{% endstylesheet %}

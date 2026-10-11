@@ -1,0 +1,134 @@
+{% doc %}
+  Renders a blog article card: image, date, author, title and a truncated excerpt.
+
+  @param {object} article - The article to render
+  @param {boolean} [show_image] - Show the article image (default true)
+  @param {boolean} [show_date] - Show the published date (default true)
+  @param {boolean} [show_author] - Show the author name (default false)
+  @param {boolean} [show_excerpt] - Show the excerpt (default true)
+  @param {boolean} [eager] - Load the image eagerly (for above-the-fold cards)
+  @param {string} [heading_tag] - Heading element for the title (default 'h2')
+  @param {string} [sizes] - The image `sizes` attribute
+
+  @example
+  {% render 'article-card', article: article, show_author: true, eager: true %}
+{% enddoc %}
+
+{%- liquid
+  assign show_image = show_image | default: true, allow_false: true
+  assign show_date = show_date | default: true, allow_false: true
+  assign show_excerpt = show_excerpt | default: true, allow_false: true
+  assign heading_tag = heading_tag | default: 'h2'
+  assign sizes = sizes | default: '(min-width: 990px) 30vw, (min-width: 750px) 45vw, 92vw'
+  assign loading = 'lazy'
+  if eager
+    assign loading = 'eager'
+  endif
+-%}
+
+<article class="article-card">
+  {%- if show_image -%}
+    <a class="article-card__media media" href="{{ article.url }}" tabindex="-1" aria-hidden="true">
+      {%- if article.image -%}
+        {%- assign card_alt = article.image.alt | default: article.title -%}
+        {%- assign card_focal_style = 'object-position: ' | append: article.image.presentation.focal_point -%}
+        {{
+          article.image
+          | image_url: width: 900
+          | image_tag:
+            widths: '300, 450, 600, 750, 900',
+            sizes: sizes,
+            loading: loading,
+            alt: card_alt,
+            style: card_focal_style
+        }}
+      {%- else -%}
+        {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+      {%- endif -%}
+    </a>
+  {%- endif -%}
+
+  <div class="article-card__body">
+    {%- if show_date or show_author and article.author != blank -%}
+      <p class="article-card__meta">
+        {%- if show_date -%}
+          {{ article.published_at | time_tag: format: 'date' }}
+        {%- endif -%}
+        {%- if show_author and article.author != blank -%}
+          {%- if show_date %} <span aria-hidden="true">&middot;</span> {% endif -%}
+          <span>{{ 'blog.article.by_author' | t: author: article.author }}</span>
+        {%- endif -%}
+      </p>
+    {%- endif -%}
+
+    <{{ heading_tag }} class="article-card__title">
+      <a href="{{ article.url }}">{{ article.title | escape }}</a>
+    </{{ heading_tag }}>
+
+    {%- if show_excerpt -%}
+      <p class="article-card__excerpt">{{ article.excerpt_or_content | strip_html | truncate: 140 }}</p>
+    {%- endif -%}
+
+    <a class="article-card__link" href="{{ article.url }}" aria-label="{{ 'blog.article.read_more_label' | t: title: article.title }}">
+      {{ 'blog.article.read_more' | t }}
+      {% render 'icon', name: 'chevron-right', class: 'icon--small' %}
+    </a>
+  </div>
+</article>
+
+{% stylesheet %}
+  .article-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-background);
+  }
+
+  .article-card__media {
+    aspect-ratio: 16 / 10;
+  }
+
+  .article-card__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 1rem;
+  }
+
+  .article-card__meta {
+    margin: 0 0 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .article-card__title {
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+  }
+
+  .article-card__title a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .article-card__title a:hover {
+    text-decoration: underline;
+  }
+
+  .article-card__excerpt {
+    color: var(--color-text-muted);
+  }
+
+  .article-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 2.75rem;
+    margin-top: auto;
+    color: var(--color-accent-text);
+    font-weight: var(--font-body-weight-bold);
+  }
+{% endstylesheet %}

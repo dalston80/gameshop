@@ -1,0 +1,34 @@
+{
+  "type": "footer",
+  "name": "t:general.footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "help": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Need help?",
+            "menu": "footer"
+          }
+        },
+        "about": {
+          "type": "text",
+          "settings": {
+            "heading": "About us",
+            "text": "<p>Games, consoles and PC hardware for every kind of player.</p>"
+          }
+        }
+      },
+      "block_order": ["help", "about"],
+      "settings": {
+        "show_newsletter": true,
+        "newsletter_heading": "Newsletter",
+        "newsletter_text": "Be the first to know about new releases, discounts and more.",
+        "show_follow_on_shop": true,
+        "show_payment_icons": true
+      }
+    }
+  },
+  "order": ["footer"]
+}

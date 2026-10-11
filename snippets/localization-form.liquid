@@ -1,0 +1,57 @@
+{% doc %}
+  Renders country and language selectors using Shopify's localization form.
+  Follows Shopify's country/language selector guidance: country and language are separate selects
+  and the form submits when a selection changes.
+
+  @param {boolean} [show_country] - Render the country/region selector
+  @param {boolean} [show_language] - Render the language selector
+  @param {string} id - Unique id prefix
+
+  @example
+  {% render 'localization-form', show_country: true, show_language: true, id: 'footer' %}
+{% enddoc %}
+
+{%- assign form_id = id | append: '-localization' -%}
+{%- form 'localization', id: form_id -%}
+  {%- if show_country -%}
+    <div class="localization__field">
+      <label class="visually-hidden" for="{{ id }}-country">{{ 'general.localization.country_label' | t }}</label>
+      <select id="{{ id }}-country" name="country_code" data-auto-submit>
+        {%- for country in localization.available_countries -%}
+          <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>
+            {{ country.name }} ({{ country.currency.iso_code }} {{ country.currency.symbol }})
+          </option>
+        {%- endfor -%}
+      </select>
+    </div>
+  {%- endif -%}
+
+  {%- if show_language -%}
+    <div class="localization__field">
+      <label class="visually-hidden" for="{{ id }}-language">{{ 'general.localization.language_label' | t }}</label>
+      <select id="{{ id }}-language" name="language_code" data-auto-submit>
+        {%- for language in localization.available_languages -%}
+          <option
+            value="{{ language.iso_code }}"
+            lang="{{ language.iso_code }}"
+            {% if language.iso_code == localization.language.iso_code %}selected{% endif %}
+          >
+            {{ language.endonym_name | capitalize }}
+          </option>
+        {%- endfor -%}
+      </select>
+    </div>
+  {%- endif -%}
+
+  <noscript>
+    <button type="submit" class="button button--small">{{ 'general.localization.update' | t }}</button>
+  </noscript>
+{%- endform -%}
+
+{% stylesheet %}
+  .localization__field select {
+    min-height: 2.5rem;
+    padding-block: 0.25rem;
+    font-size: 0.875rem;
+  }
+{% endstylesheet %}

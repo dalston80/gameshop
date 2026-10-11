@@ -1,48 +1,333 @@
 [
-    {
-    "name": "t:settings_schema.typography.name",
+  {
+    "name": "theme_info",
+    "theme_name": "GameShop",
+    "theme_version": "0.1.0",
+    "theme_author": "GameShop",
+    "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
+    "theme_support_url": "https://support.shopify.com/"
+  },
+  {
+    "name": "t:settings_schema.colors.name",
     "settings": [
       {
         "type": "header",
-        "content": "t:settings_schema.typography.settings.header__1.content"
+        "content": "t:settings_schema.colors.header_brand"
       },
       {
-        "type": "font_picker",
-        "id": "type_header_font",
-        "default": "assistant_n4",
-        "label": "t:settings_schema.typography.settings.type_header_font.label",
-        "info": "t:settings_schema.typography.settings.type_header_font.info"
+        "type": "color",
+        "id": "color_primary",
+        "label": "t:settings_schema.colors.primary.label",
+        "info": "t:settings_schema.colors.primary.info",
+        "default": "#087287"
       },
       {
-        "type": "range",
-        "id": "heading_scale",
-        "min": 100,
-        "max": 150,
-        "step": 5,
-        "unit": "%",
-        "label": "t:settings_schema.typography.settings.heading_scale.label",
-        "default": 100
+        "type": "color",
+        "id": "color_accent",
+        "label": "t:settings_schema.colors.accent.label",
+        "info": "t:settings_schema.colors.accent.info",
+        "default": "#0BE0A7"
+      },
+      {
+        "type": "color",
+        "id": "color_accent_text",
+        "label": "t:settings_schema.colors.accent_text.label",
+        "info": "t:settings_schema.colors.accent_text.info",
+        "default": "#067F5E"
+      },
+      {
+        "type": "color",
+        "id": "color_soft",
+        "label": "t:settings_schema.colors.soft.label",
+        "info": "t:settings_schema.colors.soft.info",
+        "default": "#CDEFE5"
       },
       {
         "type": "header",
-        "content": "t:settings_schema.typography.settings.header__2.content"
+        "content": "t:settings_schema.colors.header_page"
+      },
+      {
+        "type": "color",
+        "id": "color_background",
+        "label": "t:settings_schema.colors.background.label",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "color_text",
+        "label": "t:settings_schema.colors.text.label",
+        "default": "#101820"
+      },
+      {
+        "type": "color",
+        "id": "color_text_muted",
+        "label": "t:settings_schema.colors.text_muted.label",
+        "default": "#4A5A60"
+      },
+      {
+        "type": "color",
+        "id": "color_border",
+        "label": "t:settings_schema.colors.border.label",
+        "default": "#CFE3E0"
+      },
+      {
+        "type": "header",
+        "content": "t:settings_schema.colors.header_status"
+      },
+      {
+        "type": "color",
+        "id": "color_sale",
+        "label": "t:settings_schema.colors.sale.label",
+        "default": "#C80000"
+      },
+      {
+        "type": "color",
+        "id": "color_rating",
+        "label": "t:settings_schema.colors.rating.label",
+        "default": "#F5B800"
+      }
+    ]
+  },
+  {
+    "name": "t:settings_schema.platforms.name",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "t:settings_schema.platforms.intro"
+      },
+      {
+        "type": "header",
+        "content": "t:settings_schema.platforms.platform_1"
+      },
+      {
+        "type": "text",
+        "id": "platform_1_name",
+        "label": "t:settings_schema.platforms.name_label",
+        "default": "PlayStation"
+      },
+      {
+        "type": "text",
+        "id": "platform_1_tag",
+        "label": "t:settings_schema.platforms.tag_label",
+        "default": "playstation"
+      },
+      {
+        "type": "color",
+        "id": "platform_1_color",
+        "label": "t:settings_schema.platforms.color_label",
+        "default": "#0A3FB5"
+      },
+      {
+        "type": "header",
+        "content": "t:settings_schema.platforms.platform_2"
+      },
+      {
+        "type": "text",
+        "id": "platform_2_name",
+        "label": "t:settings_schema.platforms.name_label",
+        "default": "Xbox"
+      },
+      {
+        "type": "text",
+        "id": "platform_2_tag",
+        "label": "t:settings_schema.platforms.tag_label",
+        "default": "xbox"
+      },
+      {
+        "type": "color",
+        "id": "platform_2_color",
+        "label": "t:settings_schema.platforms.color_label",
+        "default": "#107C10"
+      },
+      {
+        "type": "header",
+        "content": "t:settings_schema.platforms.platform_3"
+      },
+      {
+        "type": "text",
+        "id": "platform_3_name",
+        "label": "t:settings_schema.platforms.name_label",
+        "default": "Nintendo"
+      },
+      {
+        "type": "text",
+        "id": "platform_3_tag",
+        "label": "t:settings_schema.platforms.tag_label",
+        "default": "nintendo"
+      },
+      {
+        "type": "color",
+        "id": "platform_3_color",
+        "label": "t:settings_schema.platforms.color_label",
+        "default": "#C4001A"
+      },
+      {
+        "type": "header",
+        "content": "t:settings_schema.platforms.platform_4"
+      },
+      {
+        "type": "text",
+        "id": "platform_4_name",
+        "label": "t:settings_schema.platforms.name_label",
+        "default": "PC"
+      },
+      {
+        "type": "text",
+        "id": "platform_4_tag",
+        "label": "t:settings_schema.platforms.tag_label",
+        "default": "pc"
+      },
+      {
+        "type": "color",
+        "id": "platform_4_color",
+        "label": "t:settings_schema.platforms.color_label",
+        "default": "#B34700"
+      }
+    ]
+  },
+  {
+    "name": "t:settings_schema.typography.name",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "type_heading_font",
+        "label": "t:settings_schema.typography.heading_font",
+        "default": "nunito_sans_n7"
       },
       {
         "type": "font_picker",
         "id": "type_body_font",
-        "default": "assistant_n4",
-        "label": "t:settings_schema.typography.settings.type_body_font.label",
-        "info": "t:settings_schema.typography.settings.type_body_font.info"
+        "label": "t:settings_schema.typography.body_font",
+        "default": "nunito_sans_n4"
+      }
+    ]
+  },
+  {
+    "name": "t:settings_schema.layout.name",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "t:settings_schema.layout.favicon.label",
+        "info": "t:settings_schema.layout.favicon.info"
+      },
+      {
+        "type": "select",
+        "id": "page_width",
+        "label": "t:settings_schema.layout.page_width.label",
+        "options": [
+          { "value": "80rem", "label": "t:settings_schema.layout.page_width.narrow" },
+          { "value": "90rem", "label": "t:settings_schema.layout.page_width.default" },
+          { "value": "110rem", "label": "t:settings_schema.layout.page_width.wide" }
+        ],
+        "default": "90rem"
       },
       {
         "type": "range",
-        "id": "body_scale",
-        "min": 100,
-        "max": 130,
-        "step": 5,
-        "unit": "%",
-        "label": "t:settings_schema.typography.settings.body_scale.label",
-        "default": 100
+        "id": "page_margin",
+        "min": 12,
+        "max": 64,
+        "step": 4,
+        "unit": "px",
+        "label": "t:settings_schema.layout.page_margin",
+        "default": 20
+      },
+      {
+        "type": "range",
+        "id": "corner_radius",
+        "min": 0,
+        "max": 16,
+        "step": 2,
+        "unit": "px",
+        "label": "t:settings_schema.layout.corner_radius",
+        "default": 4
+      }
+    ]
+  },
+  {
+    "name": "t:settings_schema.product_cards.name",
+    "settings": [
+      {
+        "type": "select",
+        "id": "card_image_ratio",
+        "label": "t:settings_schema.product_cards.image_ratio.label",
+        "options": [
+          { "value": "1 / 1", "label": "t:settings_schema.product_cards.image_ratio.square" },
+          { "value": "4 / 5", "label": "t:settings_schema.product_cards.image_ratio.portrait" },
+          { "value": "3 / 4", "label": "t:settings_schema.product_cards.image_ratio.tall" }
+        ],
+        "default": "4 / 5"
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_vendor",
+        "label": "t:settings_schema.product_cards.show_vendor",
+        "default": false
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_rating",
+        "label": "t:settings_schema.product_cards.show_rating",
+        "info": "t:settings_schema.product_cards.show_rating_info",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_platform",
+        "label": "t:settings_schema.product_cards.show_platform",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "card_show_quick_add",
+        "label": "t:settings_schema.product_cards.show_quick_add",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "t:settings_schema.cart.name",
+    "settings": [
+      {
+        "type": "select",
+        "id": "cart_type",
+        "label": "t:settings_schema.cart.type.label",
+        "options": [
+          { "value": "drawer", "label": "t:settings_schema.cart.type.drawer" },
+          { "value": "page", "label": "t:settings_schema.cart.type.page" }
+        ],
+        "default": "drawer"
+      },
+      {
+        "type": "checkbox",
+        "id": "cart_show_note",
+        "label": "t:settings_schema.cart.show_note",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "t:settings_schema.social.name",
+    "settings": [
+      { "type": "text", "id": "social_facebook", "label": "Facebook" },
+      { "type": "text", "id": "social_x", "label": "X" },
+      { "type": "text", "id": "social_instagram", "label": "Instagram" },
+      { "type": "text", "id": "social_youtube", "label": "YouTube" },
+      { "type": "text", "id": "social_tiktok", "label": "TikTok" },
+      { "type": "text", "id": "social_twitch", "label": "Twitch" }
+    ]
+  },
+  {
+    "name": "t:settings_schema.search.name",
+    "settings": [
+      {
+        "type": "range",
+        "id": "predictive_search_limit",
+        "min": 2,
+        "max": 8,
+        "step": 1,
+        "label": "t:settings_schema.search.predictive_limit",
+        "default": 4
       }
     ]
   }

@@ -1,0 +1,16 @@
+{% doc %}
+  Renders the errors of a customer form (login, register, addresses, password reset).
+  Renders nothing when the form has no errors.
+
+  @param {object} form - The `form` object from a Liquid form tag
+
+  @example
+  {% render 'customer-form-errors', form: form %}
+{% enddoc %}
+
+{%- if form.errors -%}
+  <div class="form-message form-message--error" role="alert" tabindex="-1" autofocus>
+    <p class="customer-errors__heading">{{ 'customer.errors.heading' | t }}</p>
+    {{ form.errors | default_errors }}
+  </div>
+{%- endif -%}

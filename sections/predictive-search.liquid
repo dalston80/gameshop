@@ -1,23 +1,164 @@
-<div id="predictive-search">
-    {% if search.performed %}
-      {% if search.results_count > 0 %}
-        <ul>
-          {% for product in search.results limit: 4 %}
-            <li>
-              <a href="{{ product.url }}">
-                {% if product.featured_image %}
-                  <img src="{{ product.featured_image | image_url: '100x100' }}" alt="{{ product.featured_image.alt }}" width="100" height="100">
-                {% endif %}
-                {{ product.title }}
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
-        {% if search.results_count > 4 %}
-          <a href="{{ routes.search_url }}?q={{ search.terms }}&options[prefix]=last">View all results ({{ search.results_count }})</a>
-        {% endif %}
-      {% else %}
-        <p>No results found for "{{ search.terms }}"</p>
-      {% endif %}
-    {% endif %}
+{%- comment -%}
+  Rendered by the Section Rendering API for predictive search (/search/suggest?section_id=predictive-search).
+{%- endcomment -%}
+
+{%- if predictive_search.performed -%}
+  {%- liquid
+    assign products = predictive_search.resources.products
+    assign collections = predictive_search.resources.collections
+    assign articles = predictive_search.resources.articles
+    assign pages = predictive_search.resources.pages
+    assign queries = predictive_search.resources.queries
+    assign total = products.size | plus: collections.size | plus: articles.size | plus: pages.size | plus: queries.size
+  -%}
+
+  <div class="predictive">
+    <p class="visually-hidden" data-predictive-status>
+      {%- if total > 0 -%}
+        {{ 'general.search.results_available' | t: count: total }}
+      {%- else -%}
+        {{ 'general.search.no_results' | t: terms: predictive_search.terms }}
+      {%- endif -%}
+    </p>
+
+    {%- if total == 0 -%}
+      <p class="predictive__empty">{{ 'general.search.no_results' | t: terms: predictive_search.terms }}</p>
+    {%- else -%}
+      {%- if queries.size > 0 -%}
+        <div class="predictive__group">
+          <h2 class="predictive__heading">{{ 'general.search.suggestions' | t }}</h2>
+          <ul>
+            {%- for query in queries -%}
+              <li><a href="{{ query.url }}">{{ query.styled_text }}</a></li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      {%- if products.size > 0 -%}
+        <div class="predictive__group">
+          <h2 class="predictive__heading">{{ 'general.search.products' | t }}</h2>
+          <ul>
+            {%- for product in products limit: settings.predictive_search_limit -%}
+              <li>
+                <a class="predictive__product" href="{{ product.url }}">
+                  <span class="predictive__thumb media">
+                    {%- if product.featured_image -%}
+                      {%- assign thumb_alt = product.featured_image.alt | default: product.title -%}
+                      {{ product.featured_image | image_url: width: 120 | image_tag: width: 60, height: 60, loading: 'lazy', alt: thumb_alt }}
+                    {%- endif -%}
+                  </span>
+                  <span>
+                    <span class="predictive__title">{{ product.title }}</span>
+                    {% render 'price', product: product %}
+                  </span>
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      {%- if collections.size > 0 -%}
+        <div class="predictive__group">
+          <h2 class="predictive__heading">{{ 'general.search.collections' | t }}</h2>
+          <ul>
+            {%- for collection in collections -%}
+              <li><a href="{{ collection.url }}">{{ collection.title }}</a></li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      {%- if articles.size > 0 or pages.size > 0 -%}
+        <div class="predictive__group">
+          <h2 class="predictive__heading">{{ 'general.search.pages' | t }}</h2>
+          <ul>
+            {%- for article in articles -%}
+              <li><a href="{{ article.url }}">{{ article.title }}</a></li>
+            {%- endfor -%}
+            {%- for page in pages -%}
+              <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      <a class="predictive__all button button--full" href="{{ routes.search_url }}?q={{ predictive_search.terms | escape }}&options[prefix]=last">
+        {{ 'general.search.view_all' | t: terms: predictive_search.terms }}
+      </a>
+    {%- endif -%}
   </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .predictive {
+    padding: 0.75rem;
+  }
+
+  .predictive__group + .predictive__group {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .predictive ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .predictive__heading {
+    margin: 0 0 0.25rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: var(--font-body-weight-bold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .predictive a:not(.button) {
+    display: block;
+    padding: 0.25rem 0;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .predictive a:not(.button):hover .predictive__title {
+    text-decoration: underline;
+  }
+
+  .predictive__product {
+    display: flex !important;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .predictive__thumb {
+    width: 3.75rem;
+    height: 3.75rem;
+    flex: none;
+  }
+
+  .predictive__title {
+    display: block;
+    font-weight: var(--font-body-weight-bold);
+  }
+
+  .predictive__empty {
+    margin: 0;
+    padding: 0.5rem;
+  }
+
+  .predictive__all {
+    margin-top: 0.75rem;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.predictive_search.name",
+  "settings": []
+}
+{% endschema %}

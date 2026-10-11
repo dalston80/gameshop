@@ -1,0 +1,82 @@
+{%- if request.page_type != 'cart' -%}
+  <cart-drawer id="cart-drawer">
+    <dialog class="drawer drawer--end" aria-labelledby="cart-drawer-title">
+      <div class="drawer__header">
+        <h2 class="drawer__title" id="cart-drawer-title">{{ 'cart.general.title' | t }}</h2>
+        <button type="button" class="icon-button" data-dialog-close aria-label="{{ 'cart.general.close' | t }}">
+          {% render 'icon', name: 'close' %}
+        </button>
+      </div>
+
+      <div class="cart-drawer__content" data-cart-drawer-content>
+        {%- if cart.item_count == 0 -%}
+          <div class="drawer__body cart-drawer__empty">
+            <p>{{ 'cart.general.empty' | t }}</p>
+            <a class="button" href="{{ routes.all_products_collection_url }}">{{ 'cart.general.continue_shopping' | t }}</a>
+          </div>
+        {%- else -%}
+          <form id="cart-drawer-form" action="{{ routes.cart_url }}" method="post" class="drawer__body">
+            {% render 'cart-line-items', cart: cart, context: 'drawer' %}
+
+            {%- if settings.cart_show_note -%}
+              <details class="cart-drawer__note">
+                <summary>{{ 'cart.general.add_note' | t }}</summary>
+                <label class="visually-hidden" for="cart-drawer-note">{{ 'cart.general.note_label' | t }}</label>
+                <textarea id="cart-drawer-note" name="note">{{ cart.note }}</textarea>
+              </details>
+            {%- endif -%}
+          </form>
+
+          <div class="cart-drawer__footer">
+            {% render 'cart-summary', cart: cart, form_id: 'cart-drawer-form' %}
+            <a class="cart-drawer__view" href="{{ routes.cart_url }}">{{ 'cart.general.view_cart' | t }}</a>
+          </div>
+        {%- endif -%}
+      </div>
+    </dialog>
+  </cart-drawer>
+{%- endif -%}
+
+{% stylesheet %}
+  .cart-drawer__content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .cart-drawer__empty {
+    display: grid;
+    align-content: start;
+    gap: 1rem;
+  }
+
+  .cart-drawer__footer {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .cart-drawer__view {
+    text-align: center;
+  }
+
+  .cart-drawer__note summary {
+    min-height: 2.75rem;
+    padding-top: 0.75rem;
+    cursor: pointer;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.cart_drawer.name",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:sections.cart_drawer.settings.paragraph"
+    }
+  ]
+}
+{% endschema %}

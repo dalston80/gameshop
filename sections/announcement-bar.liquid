@@ -1,0 +1,76 @@
+{%- if section.blocks.size > 0 -%}
+  <div class="announcement-bar" role="region" aria-label="{{ 'general.announcement.label' | t }}">
+    <div class="page-width announcement-bar__inner">
+      {%- for block in section.blocks -%}
+        <p class="announcement-bar__item" {{ block.shopify_attributes }}>
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}">{{ block.settings.text }}</a>
+          {%- else -%}
+            {{ block.settings.text }}
+          {%- endif -%}
+        </p>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% stylesheet %}
+  .announcement-bar {
+    background: var(--color-text);
+    color: var(--color-background);
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .announcement-bar__inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0 2rem;
+  }
+
+  .announcement-bar__item {
+    margin: 0;
+    padding: 0.5rem 0;
+  }
+
+  .announcement-bar a {
+    color: inherit;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.announcement_bar.name",
+  "max_blocks": 3,
+  "blocks": [
+    {
+      "type": "announcement",
+      "name": "t:sections.announcement_bar.blocks.announcement.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "t:sections.announcement_bar.blocks.announcement.settings.text.label",
+          "default": "Welcome to our store"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:sections.announcement_bar.blocks.announcement.settings.link.label"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.announcement_bar.name",
+      "blocks": [
+        {
+          "type": "announcement"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

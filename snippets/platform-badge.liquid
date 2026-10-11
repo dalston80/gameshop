@@ -1,0 +1,30 @@
+{% doc %}
+  Renders the platform badge (PlayStation, Xbox, Nintendo, PC by default) for a product,
+  based on the product's tags and the platform names, tags and colors in Theme settings.
+  Renders nothing when no platform tag matches.
+
+  @param {object} tags - The product's tags (array)
+  @param {string} [class] - Extra classes
+
+  @example
+  {% render 'platform-badge', tags: product.tags %}
+{% enddoc %}
+
+{%- liquid
+  assign lowered_tags = tags | join: '|' | downcase | split: '|'
+  assign matched = ''
+  for index in (1..4)
+    assign tag_key = 'platform_' | append: index | append: '_tag'
+    assign name_key = 'platform_' | append: index | append: '_name'
+    assign tag_value = settings[tag_key] | strip | downcase
+    if tag_value != blank and lowered_tags contains tag_value
+      assign matched = index
+      assign matched_name = settings[name_key]
+      break
+    endif
+  endfor
+-%}
+
+{%- if matched != blank -%}
+  <span class="platform-badge {{ class }}" style="--platform-color: var(--platform-{{ matched }}-color)">{{ matched_name }}</span>
+{%- endif -%}

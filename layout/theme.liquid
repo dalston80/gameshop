@@ -1,53 +1,53 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, height=device-height, minimum-scale=1.0, maximum-scale=1.0">
-    <meta name="referrer" content="origin">
-    
+    {% render 'meta-tags' %}
+    {% render 'css-variables' %}
+
+    {% unless settings.type_body_font.system? %}
+      <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+      {{ settings.type_body_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
+    {% endunless %}
+
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+
     {{ content_for_header }}
 
-    {%- liquid
-      assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
-      assign body_font_italic = settings.type_body_font | font_modify: 'style', 'italic'
-      assign body_font_bold_italic = body_font_bold | font_modify: 'style', 'italic'
-    %}
-
-    {% style %}
-      :root {
-        {{ settings.type_body_font | font_face: font_display: 'swap' }}
-        {{ body_font_bold | font_face: font_display: 'swap' }}
-        {{ body_font_italic | font_face: font_display: 'swap' }}
-        {{ body_font_bold_italic | font_face: font_display: 'swap' }}
-        {{ settings.type_header_font | font_face: font_display: 'swap' }}
-
-        --font-body-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
-        --font-body-style: {{ settings.type_body_font.style }};
-        --font-body-weight: {{ settings.type_body_font.weight }};
-        --font-body-weight-bold: {{ settings.type_body_font.weight | plus: 300 | at_most: 1000 }};
-
-        --font-heading-family: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
-        --font-heading-style: {{ settings.type_header_font.style }};
-        --font-heading-weight: {{ settings.type_header_font.weight }};
-
-        --font-body-scale: {{ settings.body_scale | divided_by: 100.0 }};
-        --font-heading-scale: {{ settings.heading_scale | times: 1.0 | divided_by: settings.body_scale }};
-      }
-    {% endstyle %}
-
-    <link rel="stylesheet" href="{{ 'base.css' | asset_url }}">
-
+    <script>
+      window.theme = {
+        cartType: {{ settings.cart_type | json }},
+        routes: {
+          root: {{ routes.root_url | json }},
+          cart: {{ routes.cart_url | json }},
+          cart_add: {{ routes.cart_add_url | json }},
+          cart_change: {{ routes.cart_change_url | json }},
+          cart_update: {{ routes.cart_update_url | json }},
+          predictive_search: {{ routes.predictive_search_url | json }},
+          search: {{ routes.search_url | json }}
+        },
+        strings: {
+          added_to_cart: {{ 'products.product.added_to_cart' | t | json }},
+          cart_error: {{ 'cart.general.error' | t | json }}
+        }
+      };
+    </script>
+    <script src="{{ 'global.js' | asset_url }}" defer></script>
   </head>
-  <body>
-    {% section 'header' %}
-    {% section 'navigation' %}
 
-    <main class="main-content" role="main" aria-label="Content">
+  <body class="template-{{ request.page_type | handle }}">
+    <a class="skip-link" href="#main-content">{{ 'general.accessibility.skip_to_content' | t }}</a>
+    <div class="visually-hidden" role="status" aria-live="polite" data-live-region></div>
+
+    {% sections 'header-group' %}
+
+    <main id="main-content" tabindex="-1">
       {{ content_for_layout }}
     </main>
 
-    <script src="{{ 'predictive-search.js' | asset_url }}" defer></script>
-    <script src="{{ 'theme-scripts.js' | asset_url }}" defer></script>
+    {% sections 'footer-group' %}
+
+    {% if settings.cart_type == 'drawer' and request.page_type != 'cart' %}
+      {% section 'cart-drawer' %}
+    {% endif %}
   </body>
-</html>          
+</html>

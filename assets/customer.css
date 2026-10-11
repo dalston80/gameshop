@@ -1,0 +1,361 @@
+/* Customer account pages (login, register, account, orders, addresses, password reset). */
+.customer {
+  padding-block: 2rem 3rem;
+}
+
+.customer--narrow {
+  max-width: calc(34rem + var(--page-margin) * 2);
+}
+
+.customer__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.customer__header .customer__title {
+  margin: 0;
+}
+
+.customer__title {
+  margin-bottom: 1.5rem;
+}
+
+.customer__subtitle {
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+}
+
+.customer__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.customer__form {
+  margin-bottom: 1.5rem;
+}
+
+.customer__row {
+  display: grid;
+  gap: 0 1rem;
+}
+
+.customer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.customer__alt {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.customer__guest {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.customer__recover {
+  margin-bottom: 1rem;
+}
+
+.customer__recover summary,
+.customer-address-new > summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  cursor: pointer;
+}
+
+.customer__recover summary {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.customer__recover details > :not(summary) {
+  margin-top: 0.75rem;
+}
+
+.customer__address {
+  margin-bottom: 1rem;
+  font-style: normal;
+}
+
+.customer__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.customer__checkbox input {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+}
+
+.customer__checkbox label {
+  margin: 0;
+  font-weight: inherit;
+}
+
+.customer__account-layout,
+.customer__addresses-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.customer__details {
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-soft);
+  color: var(--color-on-soft);
+}
+
+.customer__details a:not(.button) {
+  color: inherit;
+}
+
+.customer__name {
+  margin-bottom: 0.25rem;
+}
+
+.customer__order-meta {
+  color: var(--color-text-muted);
+}
+
+.customer__statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.5rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.customer__status-label {
+  font-weight: var(--font-body-weight-bold);
+}
+
+/* Tables: stacked cards below 750px, real tables above */
+.customer-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.customer-table thead {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.customer-table tr {
+  display: block;
+  padding-block: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.customer-table td {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.25rem 0;
+  text-align: end;
+}
+
+.customer-table td::before {
+  content: attr(data-label);
+  flex: none;
+  font-weight: var(--font-body-weight-bold);
+  text-align: start;
+}
+
+.customer-table td[data-label]:first-child .customer-item {
+  text-align: start;
+}
+
+.customer-item {
+  display: flex;
+  gap: 1rem;
+}
+
+.customer-item__media {
+  flex: none;
+  width: 5rem;
+  height: 5rem;
+}
+
+.customer-item__media img {
+  object-fit: contain;
+}
+
+.customer-item__title {
+  color: var(--color-text);
+  font-weight: var(--font-body-weight-bold);
+}
+
+.customer-item__options,
+.customer-item__meta,
+.customer-item__fulfillment {
+  margin: 0.25rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.customer-item__options div {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.customer-item__options dd {
+  margin: 0;
+}
+
+.customer-item__discounts {
+  margin: 0.25rem 0 0;
+  padding: 0;
+  color: var(--color-accent-text);
+  font-size: 0.875rem;
+  list-style: none;
+}
+
+.customer-item__tracking {
+  display: block;
+}
+
+.customer-totals {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 24rem;
+  margin: 1.5rem 0 2rem auto;
+}
+
+.customer-totals div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.customer-totals dt,
+.customer-totals dd {
+  margin: 0;
+}
+
+.customer-totals__total {
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+  font-size: 1.125rem;
+  font-weight: var(--font-body-weight-bold);
+}
+
+.customer-address-new {
+  margin-bottom: 2rem;
+}
+
+.customer-address-new .customer-address-form {
+  margin-top: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.customer-address-list {
+  display: grid;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.customer-address {
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.customer-address__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.customer-address__edit {
+  flex: 1 1 100%;
+  order: 2;
+}
+
+.customer-address__edit[open] .customer-address-form {
+  margin-top: 1rem;
+}
+
+.customer-address__edit > summary {
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.customer-address__actions > form {
+  order: 1;
+}
+
+@media (min-width: 750px) {
+  .customer__row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .customer__addresses-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .customer-table thead {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+  }
+
+  .customer-table tr {
+    display: table-row;
+    padding: 0;
+  }
+
+  .customer-table th,
+  .customer-table td {
+    display: table-cell;
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  .customer-table td::before {
+    content: none;
+  }
+
+  .customer-table .customer-table__end {
+    text-align: end;
+  }
+
+  .customer-table tr {
+    border-bottom: 0;
+  }
+}
+
+@media (min-width: 990px) {
+  .customer__account-layout {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    align-items: start;
+  }
+}

@@ -1,0 +1,365 @@
+{% doc %}
+  Renders the product form: selling plans, gift card recipient fields, quantity, Add to cart, the accelerated
+  checkout button, Shop Pay Installments and pickup availability. Regions marked `data-update` are re-rendered
+  by <product-form> (assets/product.js) when the selected variant changes.
+
+  @param {product} product - The product
+  @param {variant} variant - The currently selected variant
+  @param {string} section_id - The id of the section that renders the form
+  @param {boolean} [show_quantity] - Show the quantity selector
+  @param {boolean} [show_payment_button] - Show the accelerated checkout button (never restyled)
+  @param {boolean} [show_installments] - Show Shop Pay Installments terms
+  @param {boolean} [show_pickup] - Show pickup availability
+
+  @example
+  {% render 'buy-buttons', product: product, variant: current_variant, section_id: section.id %}
+{% enddoc %}
+
+{%- liquid
+  assign form_id = 'product-form-' | append: section_id
+  assign quantity_min = variant.quantity_rule.min | default: 1
+  assign quantity_max = variant.quantity_rule.max
+  assign quantity_step = variant.quantity_rule.increment | default: 1
+  if variant.inventory_management == 'shopify' and variant.inventory_policy == 'deny'
+    if quantity_max == blank or variant.inventory_quantity < quantity_max
+      assign quantity_max = variant.inventory_quantity
+    endif
+  endif
+  assign allocations = variant.selling_plan_allocations
+  assign variant_price = variant.price | money
+  assign announcement = 'products.product.variant_selected' | t: variant: variant.title, price: variant_price
+-%}
+
+<div class="buy-buttons" data-buy-buttons>
+  {%- form 'product',
+    product,
+    id: form_id,
+    class: 'buy-buttons__form',
+    data-cart-form: ''
+  -%}
+    <input type="hidden" name="id" value="{{ variant.id }}" {% unless variant %}disabled{% endunless %}>
+
+    {%- if product.selling_plan_groups.size > 0 -%}
+      <div data-update="selling-plans">
+        {%- if allocations.size > 0 -%}
+          <fieldset class="selling-plans">
+            <legend class="label">{{ 'products.selling_plans.legend' | t }}</legend>
+            {%- unless product.requires_selling_plan -%}
+              <div class="selling-plans__option">
+                <input
+                  type="radio"
+                  id="{{ form_id }}-plan-none"
+                  name="selling_plan"
+                  value=""
+                  {% unless product.selected_selling_plan_allocation %}
+                    checked
+                  {% endunless %}
+                >
+                <label for="{{ form_id }}-plan-none">
+                  {{ 'products.selling_plans.one_time' | t }}
+                  <span class="selling-plans__price">{{ variant.price | money }}</span>
+                </label>
+              </div>
+            {%- endunless -%}
+            {%- for group in product.selling_plan_groups -%}
+              {%- for allocation in allocations -%}
+                {%- if allocation.selling_plan_group_id == group.id -%}
+                  {%- liquid
+                    assign plan = allocation.selling_plan
+                    assign plan_checked = false
+                    if product.selected_selling_plan_allocation.selling_plan.id == plan.id
+                      assign plan_checked = true
+                    elsif product.requires_selling_plan and product.selected_selling_plan_allocation == blank and forloop.parentloop.first and forloop.first
+                      assign plan_checked = true
+                    endif
+                  -%}
+                  <div class="selling-plans__option">
+                    <input
+                      type="radio"
+                      id="{{ form_id }}-plan-{{ plan.id }}"
+                      name="selling_plan"
+                      value="{{ plan.id }}"
+                      {% if plan_checked %}
+                        checked
+                      {% endif %}
+                    >
+                    <label for="{{ form_id }}-plan-{{ plan.id }}">
+                      {{ plan.name }}
+                      <span class="selling-plans__price">
+                        {{- allocation.price | money -}}
+                        {%- if allocation.compare_at_price > allocation.price %}
+                          <s>{{ allocation.compare_at_price | money }}</s>
+                        {%- endif -%}
+                      </span>
+                      {%- if plan.price_adjustments.size > 0 and allocation.per_delivery_price != allocation.price %}
+                        {%- assign per_delivery_price = allocation.per_delivery_price | money -%}
+                        <span class="selling-plans__note">
+                          {{- 'products.selling_plans.per_delivery' | t: price: per_delivery_price -}}
+                        </span>
+                      {%- endif -%}
+                    </label>
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endfor -%}
+          </fieldset>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if product.gift_card? -%}
+      <recipient-form class="recipient-form">
+        <div class="recipient-form__toggle">
+          <input
+            type="checkbox"
+            id="{{ form_id }}-recipient-toggle"
+            name="properties[__shopify_send_gift_card_to_recipient]"
+            data-recipient-toggle
+          >
+          <label for="{{ form_id }}-recipient-toggle">{{ 'products.gift_card.send_to_recipient' | t }}</label>
+        </div>
+        <div class="recipient-form__fields" data-recipient-fields hidden>
+          <div class="field">
+            <label for="{{ form_id }}-recipient-email">{{ 'products.gift_card.recipient_email' | t }}</label>
+            <input
+              type="email"
+              id="{{ form_id }}-recipient-email"
+              name="properties[Recipient email]"
+              autocomplete="off"
+              required
+              disabled
+            >
+          </div>
+          <div class="field">
+            <label for="{{ form_id }}-recipient-name">{{ 'products.gift_card.recipient_name' | t }}</label>
+            <input
+              type="text"
+              id="{{ form_id }}-recipient-name"
+              name="properties[Recipient name]"
+              autocomplete="off"
+              disabled
+            >
+          </div>
+          <div class="field">
+            <label for="{{ form_id }}-recipient-message">{{ 'products.gift_card.message' | t }}</label>
+            <textarea
+              id="{{ form_id }}-recipient-message"
+              name="properties[Message]"
+              maxlength="200"
+              rows="3"
+              disabled
+            ></textarea>
+          </div>
+          <div class="field">
+            <label for="{{ form_id }}-recipient-date">{{ 'products.gift_card.send_on' | t }}</label>
+            <input
+              type="date"
+              id="{{ form_id }}-recipient-date"
+              name="properties[Send on]"
+              pattern="\d{4}-\d{2}-\d{2}"
+              min="{{ 'now' | date: '%Y-%m-%d' }}"
+              max="{{ 'now' | date: '%s' | plus: 7776000 | date: '%Y-%m-%d' }}"
+              aria-describedby="{{ form_id }}-recipient-date-hint"
+              disabled
+            >
+            <p class="buy-buttons__hint" id="{{ form_id }}-recipient-date-hint">{{ 'products.gift_card.send_on_hint' | t }}</p>
+          </div>
+          <input type="hidden" name="properties[__shopify_offset]" value="" disabled data-recipient-offset>
+        </div>
+      </recipient-form>
+    {%- endif -%}
+
+    {%- if show_quantity != false -%}
+      <div class="buy-buttons__quantity" data-quantity-wrapper {% unless variant.available %}hidden{% endunless %}>
+        <label for="{{ form_id }}-quantity">{{ 'products.product.quantity' | t }}</label>
+        <quantity-input class="quantity">
+          <button
+            type="button"
+            class="quantity__button"
+            data-step="-{{ quantity_step }}"
+            aria-label="{{ 'cart.general.decrease_quantity' | t: product: product.title }}"
+          >
+            {% render 'icon', name: 'minus', class: 'icon--small' %}
+          </button>
+          <input
+            type="number"
+            id="{{ form_id }}-quantity"
+            name="quantity"
+            class="quantity__input"
+            value="{{ quantity_min }}"
+            min="{{ quantity_min }}"
+            {% if quantity_max != blank %}
+              max="{{ quantity_max }}"
+            {% endif %}
+            step="{{ quantity_step }}"
+            inputmode="numeric"
+          >
+          <button
+            type="button"
+            class="quantity__button"
+            data-step="{{ quantity_step }}"
+            aria-label="{{ 'cart.general.increase_quantity' | t: product: product.title }}"
+          >
+            {% render 'icon', name: 'plus', class: 'icon--small' %}
+          </button>
+        </quantity-input>
+      </div>
+    {%- endif -%}
+
+    <div class="form-message form-message--error buy-buttons__error" data-cart-form-error role="alert" hidden></div>
+    {%- if form.errors -%}
+      <div class="form-message form-message--error buy-buttons__error" role="alert">
+        {{ form.errors | default_errors }}
+      </div>
+    {%- endif -%}
+
+    <div data-update="submit" data-buy-buttons-target>
+      <button
+        type="submit"
+        name="add"
+        class="button button--full buy-buttons__submit"
+        {% unless variant.available %}
+          disabled
+        {% endunless %}
+      >
+        {%- if variant.available -%}
+          {{ 'products.product.add_to_cart' | t }}
+        {%- else -%}
+          {{ 'products.product.sold_out' | t }}
+        {%- endif -%}
+      </button>
+    </div>
+
+    {%- if show_payment_button != false -%}
+      <div class="buy-buttons__payment" data-payment-button {% unless variant.available %}hidden{% endunless %}>
+        {{ form | payment_button }}
+      </div>
+    {%- endif -%}
+
+    {%- if show_installments != false -%}
+      <div class="buy-buttons__installments">
+        {{ form | payment_terms }}
+      </div>
+    {%- endif -%}
+  {%- endform -%}
+
+  {%- if show_pickup != false -%}
+    <div data-update="pickup">
+      {% render 'pickup-availability', variant: variant, section_id: section_id %}
+    </div>
+  {%- endif -%}
+
+  <div
+    hidden
+    data-variant-state
+    data-variant-id="{{ variant.id }}"
+    data-media-id="{{ variant.featured_media.id }}"
+    data-available="{{ variant.available }}"
+    data-quantity-min="{{ quantity_min }}"
+    data-quantity-max="{{ quantity_max }}"
+    data-quantity-step="{{ quantity_step }}"
+    data-announce="{{ announcement | escape }}"
+  ></div>
+</div>
+
+{% stylesheet %}
+  .buy-buttons__form {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .buy-buttons__quantity label {
+    margin-bottom: 0.25rem;
+  }
+
+  .buy-buttons__submit {
+    font-size: 1.125rem;
+  }
+
+  .buy-buttons__hint {
+    margin: 0.25rem 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+  }
+
+  .buy-buttons__error {
+    margin: 0;
+  }
+
+  .buy-buttons__installments:empty,
+  .buy-buttons__payment:empty {
+    display: none;
+  }
+
+  .selling-plans {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .selling-plans legend {
+    padding: 0;
+  }
+
+  .selling-plans__option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .selling-plans__option:has(input:checked) {
+    border-color: var(--color-primary);
+  }
+
+  .selling-plans__option input {
+    margin: 0.25rem 0 0;
+  }
+
+  .selling-plans__option label {
+    margin: 0;
+    font-weight: var(--font-body-weight);
+  }
+
+  .selling-plans__price {
+    display: block;
+    font-weight: var(--font-body-weight-bold);
+  }
+
+  .selling-plans__price s {
+    margin-inline-start: 0.5rem;
+    color: var(--color-text-muted);
+    font-weight: var(--font-body-weight);
+  }
+
+  .selling-plans__note {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+  }
+
+  .recipient-form {
+    display: block;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .recipient-form__toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .recipient-form__toggle label {
+    margin: 0;
+  }
+
+  .recipient-form__fields {
+    margin-top: 1rem;
+  }
+{% endstylesheet %}

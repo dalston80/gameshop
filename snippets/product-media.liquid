@@ -1,0 +1,85 @@
+{% doc %}
+  Renders one product media item (image, video, external video or 3D model).
+  The parent supplies a fixed-ratio frame; media is fitted inside it so any aspect ratio keeps the layout stable.
+
+  @param {object} media - The product media object
+  @param {string} [fallback_alt] - Alt text used when the media has none
+  @param {string} [sizes] - The image `sizes` attribute
+  @param {boolean} [eager] - Load eagerly with high priority (first visible image only)
+
+  @example
+  {% render 'product-media', media: product.featured_media, fallback_alt: product.title, eager: true %}
+{% enddoc %}
+
+{%- liquid
+  assign loading = 'lazy'
+  assign priority = 'auto'
+  if eager
+    assign loading = 'eager'
+    assign priority = 'high'
+  endif
+  assign alt_text = media.alt | escape | default: fallback_alt
+  assign sizes = sizes | default: '(min-width: 990px) 50vw, 100vw'
+  assign focal_style = media.preview_image.presentation.focal_point | prepend: '--focal-point: '
+-%}
+
+{%- case media.media_type -%}
+  {%- when 'image' -%}
+    {{
+      media
+      | image_url: width: 1600
+      | image_tag:
+        widths: '400, 600, 800, 1000, 1200, 1600',
+        sizes: sizes,
+        loading: loading,
+        fetchpriority: priority,
+        alt: alt_text,
+        class: 'product-media__item',
+        style: focal_style
+    }}
+  {%- when 'video' -%}
+    {{
+      media
+      | video_tag:
+        image_size: '1100x',
+        controls: true,
+        loop: false,
+        muted: false,
+        preload: 'none',
+        playsinline: true,
+        class: 'product-media__item',
+        title: alt_text
+    }}
+  {%- when 'external_video' -%}
+    {{ media | external_video_tag: class: 'product-media__item', loading: 'lazy', title: alt_text }}
+  {%- when 'model' -%}
+    {{
+      media
+      | model_viewer_tag:
+        image_size: '1100x',
+        reveal: 'interaction',
+        toggleable: true,
+        class: 'product-media__item',
+        alt: alt_text
+    }}
+{%- endcase -%}
+
+{% stylesheet %}
+  .product-media__item {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    border: 0;
+  }
+
+  img.product-media__item {
+    object-fit: var(--gallery-fit, contain);
+    object-position: var(--focal-point, 50% 50%);
+  }
+
+  video.product-media__item,
+  model-viewer.product-media__item {
+    object-fit: contain;
+  }
+{% endstylesheet %}
