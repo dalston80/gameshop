@@ -30,7 +30,13 @@
     "header": {
       "type": "header",
       "settings": {
-        "menu": "main-menu"
+        "logo_width": 140,
+        "menu": "main-menu",
+        "promo_text": "",
+        "promo_link": "",
+        "customer_account_menu": "customer-account-main-menu",
+        "show_localization": true,
+        "sticky": true
       }
     }
   },

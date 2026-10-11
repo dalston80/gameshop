@@ -34,9 +34,54 @@
         "autoplay": false,
         "autoplay_speed": 5
       }
+    },
+    "collection_tiles_LbjbNe": {
+      "type": "collection-tiles",
+      "blocks": {
+        "tile_EWV4Bd": {
+          "type": "tile",
+          "settings": {
+            "collection": "",
+            "heading": ""
+          }
+        },
+        "tile_ixLkzx": {
+          "type": "tile",
+          "settings": {
+            "collection": "",
+            "heading": ""
+          }
+        },
+        "tile_Ly6FRq": {
+          "type": "tile",
+          "settings": {
+            "collection": "",
+            "heading": ""
+          }
+        },
+        "tile_rtweFH": {
+          "type": "tile",
+          "settings": {
+            "collection": "",
+            "heading": ""
+          }
+        }
+      },
+      "block_order": [
+        "tile_EWV4Bd",
+        "tile_ixLkzx",
+        "tile_Ly6FRq",
+        "tile_rtweFH"
+      ],
+      "name": "t:sections.collection_tiles.presets.name",
+      "settings": {
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
     }
   },
   "order": [
-    "slideshow"
+    "slideshow",
+    "collection_tiles_LbjbNe"
   ]
 }
