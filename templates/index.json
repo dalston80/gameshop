@@ -88,11 +88,83 @@
         "padding_top": 32,
         "padding_bottom": 32
       }
+    },
+    "featured_collection_UhxjTK": {
+      "type": "featured-collection",
+      "name": "t:sections.featured_collection.presets.name",
+      "settings": {
+        "heading": "Featured products",
+        "collection": "playstation",
+        "products_to_show": 8,
+        "columns_desktop": 4,
+        "show_view_all": true,
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    },
+    "featured_product_WignEF": {
+      "type": "featured-product",
+      "blocks": {
+        "platform_4ykG34": {
+          "type": "platform",
+          "settings": {}
+        },
+        "title_wh6ziC": {
+          "type": "title",
+          "settings": {}
+        },
+        "price_pJ8EHq": {
+          "type": "price",
+          "settings": {
+            "show_tax_note": true
+          }
+        },
+        "description_LMk6Tx": {
+          "type": "description",
+          "settings": {
+            "truncate_words": 30
+          }
+        },
+        "variant_picker_bQ7WAH": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "buttons"
+          }
+        },
+        "buy_buttons_J86pXP": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_quantity": true,
+            "show_payment_button": true,
+            "show_installments": true,
+            "show_pickup": false
+          }
+        }
+      },
+      "block_order": [
+        "platform_4ykG34",
+        "title_wh6ziC",
+        "price_pJ8EHq",
+        "description_LMk6Tx",
+        "variant_picker_bQ7WAH",
+        "buy_buttons_J86pXP"
+      ],
+      "name": "t:sections.featured_product.presets.name",
+      "settings": {
+        "product": "",
+        "media_position": "start",
+        "media_ratio": "square",
+        "thumbnail_position": "bottom",
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
     }
   },
   "order": [
     "slideshow",
     "newsletter_q9qRew",
-    "collection_tiles_LbjbNe"
+    "collection_tiles_LbjbNe",
+    "featured_collection_UhxjTK",
+    "featured_product_WignEF"
   ]
 }
