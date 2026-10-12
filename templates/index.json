@@ -211,6 +211,19 @@
         "padding_top": 32,
         "padding_bottom": 32
       }
+    },
+    "featured_collection_PkBkzX": {
+      "type": "featured-collection",
+      "name": "t:sections.featured_collection.presets.name",
+      "settings": {
+        "heading": "Featured products",
+        "collection": "pc-gaming",
+        "products_to_show": 8,
+        "columns_desktop": 4,
+        "show_view_all": true,
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
     }
   },
   "order": [
@@ -219,6 +232,7 @@
     "collection_tiles_LbjbNe",
     "featured_collection_UhxjTK",
     "featured_product_WignEF",
-    "collection_icons_AppmdV"
+    "collection_icons_AppmdV",
+    "featured_collection_PkBkzX"
   ]
 }
