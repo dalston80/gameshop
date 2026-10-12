@@ -151,9 +151,9 @@
       ],
       "name": "t:sections.featured_product.presets.name",
       "settings": {
-        "product": "",
+        "product": "test-nvme-ssd",
         "media_position": "start",
-        "media_ratio": "square",
+        "media_ratio": "landscape",
         "thumbnail_position": "bottom",
         "padding_top": 32,
         "padding_bottom": 32
