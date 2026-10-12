@@ -224,6 +224,52 @@
         "padding_top": 32,
         "padding_bottom": 32
       }
+    },
+    "logo_list_Ng6tEN": {
+      "type": "logo-list",
+      "blocks": {
+        "logo_dK6ybi": {
+          "type": "logo",
+          "settings": {
+            "name": "",
+            "link": ""
+          }
+        },
+        "logo_NAhnXV": {
+          "type": "logo",
+          "settings": {
+            "name": "",
+            "link": ""
+          }
+        },
+        "logo_nzQ3jE": {
+          "type": "logo",
+          "settings": {
+            "name": "",
+            "link": ""
+          }
+        },
+        "logo_qiARkb": {
+          "type": "logo",
+          "settings": {
+            "name": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "logo_dK6ybi",
+        "logo_NAhnXV",
+        "logo_nzQ3jE",
+        "logo_qiARkb"
+      ],
+      "name": "t:sections.logo_list.presets.name",
+      "settings": {
+        "heading": "Brand partners",
+        "logo_width": 140,
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
     }
   },
   "order": [
@@ -233,6 +279,7 @@
     "featured_collection_UhxjTK",
     "featured_product_WignEF",
     "collection_icons_AppmdV",
-    "featured_collection_PkBkzX"
+    "featured_collection_PkBkzX",
+    "logo_list_Ng6tEN"
   ]
 }
