@@ -231,6 +231,7 @@
         "logo_dK6ybi": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/ps-logo.png",
             "name": "Sony",
             "link": ""
           }
@@ -238,6 +239,7 @@
         "logo_NAhnXV": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/ps-logo.png",
             "name": "XBox",
             "link": ""
           }
@@ -245,6 +247,7 @@
         "logo_nzQ3jE": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/ps-logo.png",
             "name": "Nintendo",
             "link": ""
           }
@@ -252,6 +255,7 @@
         "logo_qiARkb": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/ps-logo.png",
             "name": "PC Gaming",
             "link": ""
           }
