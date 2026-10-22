@@ -1,0 +1,118 @@
+{% doc %}
+  Renders one row of the "Complete your setup" bundle box (see sections/product-setup.liquid).
+  Single-variant, available products get a checkbox. Products with options link to the product page,
+  and sold-out products are shown disabled.
+
+  @param {product} product - The product for this row
+  @param {boolean} [is_current] - The product being viewed: always included and not removable
+
+  @example
+  {% render 'product-setup-item', product: product, is_current: true %}
+{% enddoc %}
+
+{%- liquid
+  assign item_variant = product.selected_or_first_available_variant
+  assign item_title_id = 'setup-title-' | append: product.id
+  assign item_image = product.featured_media.preview_image
+  assign has_options = false
+  unless product.has_only_default_variant
+    assign has_options = true
+  endunless
+
+  assign item_state = 'sold_out'
+  if is_current
+    assign item_state = 'current'
+  elsif product.available and has_options
+    assign item_state = 'options'
+  elsif product.available
+    assign item_state = 'selectable'
+  endif
+
+  assign variants_json = ''
+  if is_current and has_options
+    capture variants_json
+      echo '{'
+      for option_variant in product.variants
+        assign variant_money = option_variant.price | money
+        echo '"' | append: option_variant.id | append: '":{"cents":' | append: option_variant.price | append: ',"money":'
+        echo variant_money | json
+        echo ',"available":' | append: option_variant.available | append: '}'
+        unless forloop.last
+          echo ','
+        endunless
+      endfor
+      echo '}'
+    endcapture
+  endif
+  assign item_money = item_variant.price | money
+-%}
+
+<li
+  class="product-setup__item product-setup__item--{{ item_state }}"
+  data-setup-item
+  data-state="{{ item_state }}"
+  {% if item_state == 'current' or item_state == 'selectable' %}
+    data-variant-id="{{ item_variant.id }}"
+    data-price-cents="{{ item_variant.price }}"
+    data-price-money="{{ item_money | escape }}"
+  {% endif %}
+  {% if variants_json != blank %}
+    data-variants="{{ variants_json | escape }}"
+  {% endif %}
+>
+  {%- if item_state != 'options' -%}
+    <label class="product-setup__check">
+      <input
+        type="checkbox"
+        class="product-setup__checkbox"
+        {% if item_state != 'sold_out' %}
+          checked
+        {% endif %}
+        {% if item_state == 'current' or item_state == 'sold_out' %}
+          disabled
+        {% endif %}
+        data-setup-checkbox
+      >
+      <span class="visually-hidden">{{ 'products.setup.include' | t: title: product.title }}</span>
+    </label>
+  {%- else -%}
+    <span class="product-setup__check" aria-hidden="true"></span>
+  {%- endif -%}
+
+  <a class="product-setup__thumb media" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+    {%- if item_image -%}
+      {{
+        item_image
+        | image_url: width: 160
+        | image_tag: widths: '80, 120, 160', sizes: '64px', width: 64, height: 64, loading: 'lazy', alt: ''
+      }}
+    {%- else -%}
+      {{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    {%- endif -%}
+  </a>
+
+  <div class="product-setup__info">
+    {% render 'platform-badge', tags: product.tags %}
+    <a class="product-setup__title" id="{{ item_title_id }}" href="{{ product.url }}">{{ product.title }}</a>
+    {%- if is_current -%}
+      <span class="product-setup__note">{{ 'products.setup.this_item' | t }}</span>
+    {%- endif -%}
+    {%- if is_current and has_options -%}
+      <div class="price"><span class="price__current" data-setup-current-price>{{ item_money }}</span></div>
+    {%- else -%}
+      {%- if has_options -%}
+        {% render 'price', product: product %}
+      {%- else -%}
+        {% render 'price', product: product, variant: item_variant %}
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+
+  {%- if item_state == 'options' -%}
+    <a class="button button--secondary button--small product-setup__action" href="{{ product.url }}">
+      {{- 'products.product.choose_options' | t -}}
+    </a>
+  {%- elsif item_state == 'sold_out' -%}
+    <span class="product-setup__action product-setup__soldout">{{ 'products.product.sold_out' | t }}</span>
+  {%- endif -%}
+</li>

@@ -102,6 +102,50 @@
         </div>
       </div>
 
+    {%- when 'release_date' -%}
+      {%- capture release_text -%}
+        {% render 'release-status', product: product, format: 'text' %}
+      {%- endcapture -%}
+      {%- if release_text != blank -%}
+        <p class="product-block product-release-date" {{ block.shopify_attributes }}>{{ release_text }}</p>
+      {%- endif -%}
+
+    {%- when 'editions' -%}
+      {%- capture edition_items -%}
+        {%- for edition_product in product.metafields.custom.other_editions.value -%}
+          {%- if edition_product == blank or edition_product.id == product.id -%}
+            {%- continue -%}
+          {%- endif -%}
+          <li>
+            <a class="product-editions__chip" href="{{ edition_product.url }}">
+              {% render 'platform-badge', tags: edition_product.tags %}
+              <span class="product-editions__title">{{ edition_product.title }}</span>
+              {% render 'price', product: edition_product %}
+              {%- unless edition_product.available -%}
+                <span class="product-editions__soldout">{{ 'products.inventory.sold_out' | t }}</span>
+              {%- endunless -%}
+            </a>
+          </li>
+        {%- endfor -%}
+      {%- endcapture -%}
+      {%- if edition_items != blank -%}
+        {%- assign editions_heading_id = 'editions-heading-' | append: block.id -%}
+        <div class="product-block product-editions" {{ block.shopify_attributes }}>
+          {%- if block.settings.heading != blank -%}
+            <h2 class="product-editions__heading" id="{{ editions_heading_id }}">{{ block.settings.heading }}</h2>
+            <ul class="product-editions__list" role="list" aria-labelledby="{{ editions_heading_id }}">
+              {{ edition_items }}
+            </ul>
+          {%- else -%}
+            <ul class="product-editions__list" role="list" aria-label="{{ 'products.editions.list_label' | t }}">
+              {{ edition_items }}
+            </ul>
+          {%- endif -%}
+        </div>
+      {%- elsif request.design_mode -%}
+        <p class="product-block product-editions__hint" {{ block.shopify_attributes }}>{{ 'products.editions.empty_editor' | t }}</p>
+      {%- endif -%}
+
     {%- when 'sku' -%}
       <div class="product-block product-block--sku" data-update="sku-{{ block.id }}" {{ block.shopify_attributes }}>
         {%- if variant.sku != blank -%}
@@ -260,6 +304,66 @@
     margin: 0.25rem 0 0;
     color: var(--color-text-muted);
     font-size: 0.8125rem;
+  }
+
+  .product-release-date {
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+  }
+
+  .product-editions__heading {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+  }
+
+  .product-editions__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .product-editions__chip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-background);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .product-editions__chip:hover {
+    border-color: var(--color-primary);
+    text-decoration: none;
+  }
+
+  .product-editions__title {
+    font-weight: var(--font-body-weight-bold);
+    overflow-wrap: anywhere;
+  }
+
+  .product-editions__chip .price {
+    font-size: 0.9375rem;
+  }
+
+  .product-editions__soldout {
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+  }
+
+  .product-editions__hint {
+    padding: 0.75rem;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius);
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
   }
 
   .product-block--sku {

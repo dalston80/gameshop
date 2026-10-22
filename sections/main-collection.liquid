@@ -191,7 +191,7 @@
                     {%- assign card_loading = 'eager' -%}
                   {%- endif -%}
                   <li>
-                    {% render 'product-card', product: product, sizes: card_sizes, eager: card_loading %}
+                    {% render 'product-card', product: product, sizes: card_sizes, eager: card_loading, heading_tag: 'h2' %}
                   </li>
                 {%- endfor -%}
               </ul>

@@ -1,30 +1,49 @@
 {% doc %}
-  Renders the platform badge (PlayStation, Xbox, Nintendo, PC by default) for a product,
-  based on the product's tags and the platform names, tags and colors in Theme settings.
+  Renders platform badges (PlayStation, Xbox, Nintendo, PC by default) for a product, based on its tags and the
+  platform names, tags and colors in Theme settings > Platforms. A product can match several platforms.
   Renders nothing when no platform tag matches.
 
+  When "My Platform" is enabled, it also renders a "Works with your PlayStation" chip per matched platform.
+  The chips are hidden by CSS until the shopper picks that platform (the picker sets `data-my-platform` on <html>).
+
   @param {object} tags - The product's tags (array)
+  @param {string} [format] - 'badge' (default) or 'ids' (space-separated platform numbers, for data attributes)
   @param {string} [class] - Extra classes
 
   @example
   {% render 'platform-badge', tags: product.tags %}
+  {% capture platform_ids %}{% render 'platform-badge', tags: product.tags, format: 'ids' %}{% endcapture %}
 {% enddoc %}
 
 {%- liquid
   assign lowered_tags = tags | join: '|' | downcase | split: '|'
-  assign matched = ''
+  assign matched_ids = ''
   for index in (1..4)
     assign tag_key = 'platform_' | append: index | append: '_tag'
-    assign name_key = 'platform_' | append: index | append: '_name'
     assign tag_value = settings[tag_key] | strip | downcase
     if tag_value != blank and lowered_tags contains tag_value
-      assign matched = index
-      assign matched_name = settings[name_key]
-      break
+      assign matched_ids = matched_ids | append: index | append: ' '
     endif
   endfor
+  assign matched_ids = matched_ids | strip
+  assign matched = matched_ids | split: ' '
 -%}
 
-{%- if matched != blank -%}
-  <span class="platform-badge {{ class }}" style="--platform-color: var(--platform-{{ matched }}-color)">{{ matched_name }}</span>
+{%- if format == 'ids' -%}
+  {{- matched_ids -}}
+{%- else -%}
+  {%- for index in matched -%}
+    {%- assign name_key = 'platform_' | append: index | append: '_name' -%}
+    <span class="platform-badge {{ class }}" style="--platform-color: var(--platform-{{ index }}-color)">{{ settings[name_key] }}</span>
+  {%- endfor -%}
+
+  {%- if settings.enable_my_platform -%}
+    {%- for index in matched -%}
+      {%- assign name_key = 'platform_' | append: index | append: '_name' -%}
+      <span class="platform-compat" data-platform-id="{{ index }}">
+        {% render 'icon', name: 'check', class: 'icon--small' %}
+        {{ 'general.platform.works_with' | t: platform: settings[name_key] }}
+      </span>
+    {%- endfor -%}
+  {%- endif -%}
 {%- endif -%}

@@ -1,0 +1,172 @@
+{%- liquid
+  assign source = section.settings.collection
+  assign today_key = 'now' | date: '%Y-%m-%d'
+  assign sortable = ''
+
+  if source != blank
+    for product in source.products
+      assign release_date = product.metafields.custom.release_date.value
+      if release_date != blank
+        assign release_key = release_date | date: '%Y-%m-%d'
+        if release_key >= today_key
+          assign entry = release_key | append: '|' | append: forloop.index0
+          if sortable == ''
+            assign sortable = entry
+          else
+            assign sortable = sortable | append: ',' | append: entry
+          endif
+        endif
+      endif
+    endfor
+  endif
+
+  assign entries = sortable | split: ',' | sort
+  assign month_limit = section.settings.months_to_show
+  assign months = ''
+  for entry in entries
+    assign entry_month = entry | slice: 0, 7
+    unless months contains entry_month
+      assign months = months | append: entry_month | append: ','
+    endunless
+  endfor
+  assign month_keys = months | split: ','
+-%}
+
+<div
+  class="section release-calendar"
+  style="--section-padding-top: {{ section.settings.padding_top }}px; --section-padding-bottom: {{ section.settings.padding_bottom }}px; --grid-columns: {{ section.settings.columns_desktop }}; --grid-columns-mobile: 2;"
+>
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="section-heading section-heading--start">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- if entries.size > 0 -%}
+      {%- for month_key in month_keys limit: month_limit -%}
+        {%- assign month_start = month_key | append: '-01' -%}
+        {%- assign month_number = month_start | date: '%-m' -%}
+        {%- assign month_year = month_start | date: '%Y' -%}
+        {%- assign month_name_key = 'general.months.' | append: month_number -%}
+        <h3 class="release-calendar__month">{{ month_name_key | t }} {{ month_year }}</h3>
+        <ul class="product-grid release-calendar__grid" role="list">
+          {%- for entry in entries -%}
+            {%- assign entry_month = entry | slice: 0, 7 -%}
+            {%- if entry_month == month_key -%}
+              {%- liquid
+                assign parts = entry | split: '|'
+                assign release_key = parts[0]
+                assign product_index = parts[1] | plus: 0
+                assign product = source.products[product_index]
+              -%}
+              <li class="release-calendar__item">
+                <p class="release-calendar__date">{{ release_key | time_tag: format: 'abbreviated_date' }}</p>
+                {% render 'product-card', product: product, heading_tag: 'h4' %}
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- endfor -%}
+    {%- elsif request.design_mode or section.settings.collection != blank -%}
+      <p class="release-calendar__empty">{{ 'sections.release_calendar.empty' | t }}</p>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .release-calendar__month {
+    margin: 2rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--color-accent);
+    font-size: 1.25rem;
+  }
+
+  .release-calendar__month:first-of-type {
+    margin-top: 0;
+  }
+
+  .release-calendar__date {
+    margin: 0 0 0.375rem;
+    color: var(--color-primary);
+    font-size: 0.875rem;
+    font-weight: var(--font-body-weight-bold);
+  }
+
+  .release-calendar__item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .release-calendar__item .product-card {
+    flex: 1;
+  }
+
+  .release-calendar__empty {
+    margin: 0;
+    padding: 2rem 0;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.release_calendar.name",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:sections.release_calendar.settings.heading.label",
+      "default": "Upcoming releases"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:sections.release_calendar.settings.collection.label",
+      "info": "t:sections.release_calendar.settings.collection.info"
+    },
+    {
+      "type": "range",
+      "id": "months_to_show",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "label": "t:sections.release_calendar.settings.months_to_show.label",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 5,
+      "step": 1,
+      "label": "t:sections.release_calendar.settings.columns_desktop.label",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.release_calendar.settings.padding_top.label",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "t:sections.release_calendar.settings.padding_bottom.label",
+      "default": 32
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.release_calendar.name"
+    }
+  ]
+}
+{% endschema %}

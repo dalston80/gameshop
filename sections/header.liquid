@@ -116,8 +116,10 @@
           </div>
         {%- endif -%}
 
+        {% render 'platform-picker' %}
+
         {%- if shop.customer_accounts_enabled -%}
-          <shopify-account class="site-header__account" menu="{{ section.settings.customer_account_menu }}"></shopify-account>
+          <shopify-account class="site-header__account" {% if section.settings.customer_account_menu != blank %}menu="{{ section.settings.customer_account_menu }}"{% endif %}></shopify-account>
         {%- endif -%}
 
         <a class="site-header__cart icon-button" href="{{ routes.cart_url }}" data-dialog-open="cart-drawer">
@@ -202,7 +204,7 @@
 
   .site-header__bar-inner {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.5rem 1rem;
     min-height: 3.5rem;
@@ -212,13 +214,26 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    min-width: 0;
     font-family: var(--font-heading);
     font-size: 1.25rem;
     font-weight: var(--font-heading-weight);
     text-decoration: none;
   }
 
+  .site-header__logo span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .site-header__logo img {
+    max-width: 100%;
+    height: auto;
+  }
+
   .site-header__logo-icon {
+    flex: none;
     width: 2rem;
     height: 2rem;
   }

@@ -186,6 +186,44 @@
     ]
   },
   {
+    "name": "t:settings_schema.gaming.name",
+    "settings": [
+      {
+        "type": "header",
+        "content": "t:settings_schema.gaming.header_platform"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_my_platform",
+        "label": "t:settings_schema.gaming.enable_my_platform.label",
+        "info": "t:settings_schema.gaming.enable_my_platform.info",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "t:settings_schema.gaming.header_release"
+      },
+      {
+        "type": "range",
+        "id": "new_release_days",
+        "min": 7,
+        "max": 90,
+        "step": 1,
+        "unit": "d",
+        "label": "t:settings_schema.gaming.new_release_days.label",
+        "info": "t:settings_schema.gaming.new_release_days.info",
+        "default": 30
+      },
+      {
+        "type": "checkbox",
+        "id": "preorder_label",
+        "label": "t:settings_schema.gaming.preorder_label.label",
+        "info": "t:settings_schema.gaming.preorder_label.info",
+        "default": true
+      }
+    ]
+  },
+  {
     "name": "t:settings_schema.typography.name",
     "settings": [
       {

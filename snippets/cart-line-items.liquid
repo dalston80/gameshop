@@ -38,6 +38,13 @@
           <p class="cart-line__plan">{{ item.selling_plan_allocation.selling_plan.name }}</p>
         {%- endif -%}
 
+        {%- capture line_release_state -%}
+          {% render 'release-status', product: item.product, format: 'state' %}
+        {%- endcapture -%}
+        {%- if line_release_state == 'upcoming' -%}
+          <p class="cart-line__plan">{% render 'release-status', product: item.product, format: 'text' %}</p>
+        {%- endif -%}
+
         {%- assign property_size = item.properties | size -%}
         {%- if property_size > 0 -%}
           <dl class="cart-line__options">

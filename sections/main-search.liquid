@@ -137,7 +137,7 @@
                           {%- assign card_loading = 'eager' -%}
                         {%- endif -%}
                         <li>
-                          {% render 'product-card', product: item, sizes: card_sizes, eager: card_loading %}
+                          {% render 'product-card', product: item, sizes: card_sizes, eager: card_loading, heading_tag: 'h2' %}
                         </li>
                       {%- else -%}
                         <li class="search-page__text-result">

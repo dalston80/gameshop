@@ -1,0 +1,213 @@
+{% doc %}
+  Renders the "My Platform" picker button and its dialog. The shopper's choice is saved in the browser
+  (localStorage key `gs-platform`) and reflected as `data-my-platform` on <html>, which CSS uses to show
+  "Works with your ..." chips and to move matching home page tiles first.
+  Renders nothing when the setting is off or no platform is configured.
+
+  @example
+  {% render 'platform-picker' %}
+{% enddoc %}
+
+{%- if settings.enable_my_platform -%}
+  {%- liquid
+    assign has_platforms = false
+    for index in (1..4)
+      assign name_key = 'platform_' | append: index | append: '_name'
+      assign tag_key = 'platform_' | append: index | append: '_tag'
+      if settings[name_key] != blank and settings[tag_key] != blank
+        assign has_platforms = true
+      endif
+    endfor
+  -%}
+
+  {%- if has_platforms -%}
+    <platform-picker class="platform-picker">
+      <button
+        type="button"
+        class="platform-picker__button"
+        data-dialog-open="platform-picker-dialog"
+        aria-haspopup="dialog"
+      >
+        {% render 'icon', name: 'gamepad' %}
+        <span class="platform-picker__label">
+          <span class="platform-picker__prefix">{{ 'general.platform.playing_on' | t }}</span>
+          <strong data-platform-label>{{ 'general.platform.all' | t }}</strong>
+        </span>
+      </button>
+
+      <dialog-element id="platform-picker-dialog">
+        <dialog class="modal" aria-labelledby="platform-picker-title">
+          <div class="modal__header">
+            <h2 class="modal__title" id="platform-picker-title">{{ 'general.platform.title' | t }}</h2>
+            <button type="button" class="icon-button" data-dialog-close aria-label="{{ 'general.platform.close' | t }}">
+              {% render 'icon', name: 'close' %}
+            </button>
+          </div>
+          <form class="modal__body" method="dialog">
+            <fieldset class="platform-picker__options">
+              <legend class="platform-picker__legend">{{ 'general.platform.legend' | t }}</legend>
+              <p class="platform-picker__hint">{{ 'general.platform.hint' | t }}</p>
+
+              <label class="platform-option">
+                <input type="radio" name="my-platform" value="" data-platform-name="{{ 'general.platform.all' | t | escape }}" checked>
+                <span class="platform-option__dot platform-option__dot--all" aria-hidden="true"></span>
+                <span>{{ 'general.platform.all' | t }}</span>
+              </label>
+
+              {%- for index in (1..4) -%}
+                {%- assign name_key = 'platform_' | append: index | append: '_name' -%}
+                {%- assign tag_key = 'platform_' | append: index | append: '_tag' -%}
+                {%- if settings[name_key] != blank and settings[tag_key] != blank -%}
+                  <label class="platform-option">
+                    <input type="radio" name="my-platform" value="{{ index }}" data-platform-name="{{ settings[name_key] | escape }}">
+                    <span class="platform-option__dot" style="--platform-color: var(--platform-{{ index }}-color)" aria-hidden="true"></span>
+                    <span>{{ settings[name_key] }}</span>
+                  </label>
+                {%- endif -%}
+              {%- endfor -%}
+            </fieldset>
+          </form>
+        </dialog>
+      </dialog-element>
+    </platform-picker>
+  {%- endif -%}
+{%- endif -%}
+
+{% stylesheet %}
+  .platform-picker__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0 0.5rem;
+    border: 0;
+    border-radius: var(--radius);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .platform-picker__button:hover {
+    background: rgb(255 255 255 / 0.14);
+  }
+
+  .platform-picker__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  @media (min-width: 1100px) {
+    .platform-picker__label {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip: auto;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+      text-align: start;
+    }
+
+    .platform-picker__prefix {
+      font-size: 0.75rem;
+      opacity: 0.85;
+    }
+  }
+
+  .modal {
+    width: min(26rem, calc(100vw - 2rem));
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--color-background);
+    color: var(--color-text);
+  }
+
+  .modal::backdrop {
+    background: rgb(0 0 0 / 0.5);
+  }
+
+  .modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .modal__title {
+    margin: 0;
+    font-size: 1.25rem;
+  }
+
+  .modal__body {
+    padding: 1rem 1.25rem 1.5rem;
+  }
+
+  .platform-picker__options {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .platform-picker__legend {
+    padding: 0;
+    font-weight: var(--font-body-weight-bold);
+  }
+
+  .platform-picker__hint {
+    margin: 0 0 0.5rem;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .platform-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 2.75rem;
+    margin: 0;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    font-weight: var(--font-body-weight);
+    cursor: pointer;
+  }
+
+  .platform-option:has(input:checked) {
+    border-color: var(--color-text);
+    box-shadow: inset 0 0 0 1px var(--color-text);
+  }
+
+  .platform-option:has(input:focus-visible) {
+    outline: 3px solid var(--color-text);
+    outline-offset: 2px;
+  }
+
+  .platform-option input {
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0;
+    accent-color: var(--color-text);
+  }
+
+  .platform-option__dot {
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 50%;
+    background: var(--platform-color, var(--color-border));
+  }
+
+  .platform-option__dot--all {
+    background: conic-gradient(var(--platform-1-color), var(--platform-2-color), var(--platform-3-color), var(--platform-4-color), var(--platform-1-color));
+  }
+{% endstylesheet %}

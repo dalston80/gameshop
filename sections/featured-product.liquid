@@ -208,6 +208,12 @@
       ]
     },
     {
+      "type": "release_date",
+      "name": "t:sections.main_product.blocks.release_date.name",
+      "limit": 1,
+      "settings": []
+    },
+    {
       "type": "variant_picker",
       "name": "t:sections.main_product.blocks.variant_picker.name",
       "limit": 1,
@@ -222,6 +228,23 @@
             { "value": "dropdowns", "label": "t:sections.main_product.blocks.variant_picker.settings.picker_type.options__2.label" }
           ],
           "default": "buttons"
+        }
+      ]
+    },
+    {
+      "type": "editions",
+      "name": "t:sections.main_product.blocks.editions.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "t:sections.main_product.blocks.editions.settings.paragraph.content"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:sections.main_product.blocks.editions.settings.heading.label",
+          "default": "Also available on"
         }
       ]
     },

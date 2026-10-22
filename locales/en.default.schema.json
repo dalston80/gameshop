@@ -104,6 +104,23 @@
     "search": {
       "name": "Search",
       "predictive_limit": "Predictive search products"
+    },
+    "gaming": {
+      "name": "Gaming features",
+      "header_platform": "My Platform",
+      "enable_my_platform": {
+        "label": "Show the My Platform picker",
+        "info": "Lets shoppers choose their console or PC once. Products for that platform are highlighted. Uses the platform tags set in Platforms."
+      },
+      "header_release": "Release dates",
+      "new_release_days": {
+        "label": "New release window",
+        "info": "Products released within this many days show a New release badge. Needs the custom.release_date product metafield."
+      },
+      "preorder_label": {
+        "label": "Use Pre-order button label",
+        "info": "Replaces Add to cart with Pre-order for products whose release date is in the future."
+      }
     }
   },
   "sections": {
@@ -296,6 +313,11 @@
             "image": {
               "label": "Image",
               "info": "Leave blank to use the collection image."
+            },
+            "platform": {
+              "label": "Prioritize for platform",
+              "info": "When a shopper picks this platform in My Platform, this tile moves to the front.",
+              "none": "None"
             }
           }
         }
@@ -915,6 +937,20 @@
               "content": "Blocks placed after this one appear in a full-width Reviews and Q&A tab below the buy box. Add your reviews app block after it."
             }
           }
+        },
+        "editions": {
+          "name": "Editions and platforms",
+          "settings": {
+            "paragraph": {
+              "content": "Lists the products in the Other editions metafield (custom.other_editions)."
+            },
+            "heading": {
+              "label": "Heading"
+            }
+          }
+        },
+        "release_date": {
+          "name": "Release date"
         }
       }
     },
@@ -975,6 +1011,42 @@
     },
     "product_card_render": {
       "name": "Product card"
+    },
+    "release_calendar": {
+      "name": "Release calendar",
+      "settings": {
+        "heading": {
+          "label": "Heading"
+        },
+        "collection": {
+          "label": "Collection",
+          "info": "Products need the custom.release_date metafield. Up to 50 products are checked."
+        },
+        "months_to_show": {
+          "label": "Months to show"
+        },
+        "columns_desktop": {
+          "label": "Columns on desktop"
+        },
+        "padding_top": {
+          "label": "Top padding"
+        },
+        "padding_bottom": {
+          "label": "Bottom padding"
+        }
+      }
+    },
+    "product_setup": {
+      "name": "Complete your setup",
+      "settings": {
+        "heading": {
+          "label": "Heading"
+        },
+        "max_items": {
+          "label": "Maximum companion products",
+          "info": "Companions come from product recommendations, or from the Setup items metafield (custom.setup_items) when a product has one."
+        }
+      }
     }
   }
 }

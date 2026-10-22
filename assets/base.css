@@ -602,3 +602,37 @@ textarea {
   appearance: none;
   margin: 0;
 }
+
+/* My Platform: chips and tile ordering react to <html data-my-platform="N"> */
+.platform-compat {
+  display: none;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--color-accent-text);
+  font-size: 0.8125rem;
+  font-weight: var(--font-body-weight-bold);
+}
+
+html[data-my-platform='1'] .platform-compat[data-platform-id='1'],
+html[data-my-platform='2'] .platform-compat[data-platform-id='2'],
+html[data-my-platform='3'] .platform-compat[data-platform-id='3'],
+html[data-my-platform='4'] .platform-compat[data-platform-id='4'] {
+  display: inline-flex;
+}
+
+html[data-my-platform='1'] [data-platform-id='1'].collection-tiles__item,
+html[data-my-platform='2'] [data-platform-id='2'].collection-tiles__item,
+html[data-my-platform='3'] [data-platform-id='3'].collection-tiles__item,
+html[data-my-platform='4'] [data-platform-id='4'].collection-tiles__item {
+  order: -1;
+}
+
+.badge--release {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.badge--release-new {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}

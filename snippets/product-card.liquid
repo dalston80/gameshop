@@ -7,6 +7,7 @@
   @param {string} [sizes] - The image `sizes` attribute
   @param {boolean} [show_quick_add] - Override the theme setting for the quick-add button
   @param {string} [id_prefix] - Prefix for generated ids (use when cards are inserted dynamically)
+  @param {string} [heading_tag] - Heading element for the title: h2 when the card follows the page h1, h3 inside a section with its own h2 (default)
 
   @example
   {% render 'product-card', product: product, eager: true %}
@@ -30,6 +31,7 @@
     increment product_card_uid
   endcapture
   assign card_id = id_prefix | default: 'card' | append: '-' | append: product.id | append: '-' | append: card_uid
+  assign title_tag = heading_tag | default: 'h3'
 -%}
 
 <article class="product-card" data-product-card>
@@ -50,6 +52,9 @@
   </a>
 
   <div class="product-card__badges">
+    {%- if product.available -%}
+      {% render 'release-status', product: product, format: 'badge' %}
+    {%- endif -%}
     {%- if product.compare_at_price > product.price and product.available -%}
       <span class="badge badge--sale">{{ 'products.badge.save' | t: amount: saving }}</span>
     {%- elsif product.available == false -%}
@@ -66,9 +71,9 @@
       <p class="product-card__vendor">{{ product.vendor }}</p>
     {%- endif -%}
 
-    <h3 class="product-card__title" id="{{ card_id }}">
+    <{{ title_tag }} class="product-card__title" id="{{ card_id }}">
       <a href="{{ product.url }}">{{ product.title }}</a>
-    </h3>
+    </{{ title_tag }}>
 
     {%- if settings.card_show_rating -%}
       {% render 'rating', product: product %}
@@ -127,6 +132,10 @@
     position: absolute;
     top: 0;
     right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
   }
 
   .product-card__body {

@@ -18,7 +18,7 @@
             assign tile_url = collection.url
           -%}
           {%- if tile_url != blank or request.design_mode -%}
-            <li class="collection-tiles__item" {{ block.shopify_attributes }}>
+            <li class="collection-tiles__item" {% if block.settings.platform != blank %}data-platform-id="{{ block.settings.platform }}"{% endif %} {{ block.shopify_attributes }}>
               <a
                 class="collection-tiles__tile{% if image == blank %} collection-tiles__tile--empty{% endif %}"
                 {% if tile_url != blank %}
@@ -177,6 +177,20 @@
           "id": "image",
           "label": "t:sections.collection_tiles.blocks.tile.settings.image.label",
           "info": "t:sections.collection_tiles.blocks.tile.settings.image.info"
+        },
+        {
+          "type": "select",
+          "id": "platform",
+          "label": "t:sections.collection_tiles.blocks.tile.settings.platform.label",
+          "info": "t:sections.collection_tiles.blocks.tile.settings.platform.info",
+          "options": [
+            { "value": "", "label": "t:sections.collection_tiles.blocks.tile.settings.platform.none" },
+            { "value": "1", "label": "t:settings_schema.platforms.platform_1" },
+            { "value": "2", "label": "t:settings_schema.platforms.platform_2" },
+            { "value": "3", "label": "t:settings_schema.platforms.platform_3" },
+            { "value": "4", "label": "t:settings_schema.platforms.platform_4" }
+          ],
+          "default": ""
         }
       ]
     }

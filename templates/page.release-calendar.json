@@ -1,0 +1,23 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-page",
+      "settings": {
+        "padding_top": 32,
+        "padding_bottom": 0
+      }
+    },
+    "calendar": {
+      "type": "release-calendar",
+      "settings": {
+        "heading": "",
+        "collection": "all",
+        "months_to_show": 6,
+        "columns_desktop": 4,
+        "padding_top": 0,
+        "padding_bottom": 32
+      }
+    }
+  },
+  "order": ["main", "calendar"]
+}

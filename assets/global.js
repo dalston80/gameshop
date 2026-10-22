@@ -187,10 +187,12 @@ document.addEventListener('click', async (event) => {
   event.preventDefault();
   const line = Number(control.dataset.line);
   const quantity = Number(control.dataset.quantity);
+  // Decide now: the drawer may re-render (detaching this control) while the request is in flight.
+  const inDrawer = Boolean(control.closest('cart-drawer'));
   control.setAttribute('aria-disabled', 'true');
   try {
     await Cart.change(line, quantity);
-    if (control.closest('cart-drawer')) {
+    if (inDrawer) {
       await Cart.refreshDrawer();
     } else {
       window.location.reload();
@@ -307,12 +309,10 @@ class PredictiveSearch extends HTMLElement {
 
   show() {
     this.results.hidden = false;
-    this.input.setAttribute('aria-expanded', 'true');
   }
 
   hide() {
     this.results.hidden = true;
-    this.input.setAttribute('aria-expanded', 'false');
   }
 }
 customElements.define('predictive-search', PredictiveSearch);

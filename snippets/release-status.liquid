@@ -1,0 +1,55 @@
+{% doc %}
+  Reads the product's `custom.release_date` metafield (type: Date) and works out its release state.
+
+  - format 'state' prints `upcoming`, `new` or nothing, so callers can use it with `capture`.
+  - format 'badge' prints a small badge ("Pre-order" or "New release").
+  - format 'text' prints a sentence such as "Releases October 31, 2026" (upcoming only) or "Released October 31, 2026".
+
+  Nothing is printed when the metafield is empty, so stores without release dates are unaffected.
+  "New" is a release within the last `settings.new_release_days` days.
+
+  @param {product} product - The product
+  @param {string} [format] - 'state' (default), 'badge' or 'text'
+
+  @example
+  {% capture release_state %}{% render 'release-status', product: product, format: 'state' %}{% endcapture %}
+  {% render 'release-status', product: product, format: 'badge' %}
+{% enddoc %}
+
+{%- liquid
+  assign release_date = product.metafields.custom.release_date.value
+  assign release_state = ''
+
+  if release_date != blank
+    assign today_key = 'now' | date: '%Y-%m-%d'
+    assign release_key = release_date | date: '%Y-%m-%d'
+
+    if release_key > today_key
+      assign release_state = 'upcoming'
+    else
+      assign now_seconds = 'now' | date: '%s' | plus: 0
+      assign release_seconds = release_date | date: '%s' | plus: 0
+      assign days_since = now_seconds | minus: release_seconds | divided_by: 86400
+      if days_since <= settings.new_release_days
+        assign release_state = 'new'
+      endif
+    endif
+  endif
+
+  assign output_format = format | default: 'state'
+-%}
+
+{%- if output_format == 'state' -%}
+  {{- release_state -}}
+{%- elsif output_format == 'badge' and release_state == 'upcoming' -%}
+  <span class="badge badge--release">{{ 'products.release.preorder' | t }}</span>
+{%- elsif output_format == 'badge' and release_state == 'new' -%}
+  <span class="badge badge--release badge--release-new">{{ 'products.release.new' | t }}</span>
+{%- elsif output_format == 'text' and release_date != blank -%}
+  {%- assign release_display = release_date | time_tag: format: 'date' -%}
+  {%- if release_state == 'upcoming' -%}
+    {{ 'products.release.releases_on' | t: date: release_display }}
+  {%- else -%}
+    {{ 'products.release.released_on' | t: date: release_display }}
+  {%- endif -%}
+{%- endif -%}

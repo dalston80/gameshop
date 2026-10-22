@@ -63,6 +63,31 @@
       "previous": "Previous page",
       "next": "Next page",
       "page": "Page {{ number }}"
+    },
+    "platform": {
+      "playing_on": "Playing on",
+      "all": "All platforms",
+      "title": "Choose your platform",
+      "close": "Close",
+      "legend": "I play on",
+      "hint": "We'll highlight products that work with your platform. You can change this any time.",
+      "works_with": "Works with your {{ platform }}",
+      "selected": "Showing products for {{ platform }}",
+      "cleared": "Showing products for all platforms"
+    },
+    "months": {
+      "1": "January",
+      "2": "February",
+      "3": "March",
+      "4": "April",
+      "5": "May",
+      "6": "June",
+      "7": "July",
+      "8": "August",
+      "9": "September",
+      "10": "October",
+      "11": "November",
+      "12": "December"
     }
   },
   "products": {
@@ -154,6 +179,24 @@
     "featured": {
       "placeholder_title": "Featured product",
       "placeholder_text": "Choose a product in the section settings to feature it here."
+    },
+    "release": {
+      "preorder": "Pre-order",
+      "new": "New release",
+      "releases_on": "Releases {{ date }}",
+      "released_on": "Released {{ date }}"
+    },
+    "setup": {
+      "include": "Include {{ title }} in your bundle",
+      "this_item": "This item",
+      "total": "Total",
+      "add_all": "Add all to cart",
+      "list_label": "Items in your setup",
+      "empty_editor": "Companion products appear here on your live store when this product has complementary recommendations or a Setup items metafield (custom.setup_items)."
+    },
+    "editions": {
+      "list_label": "Other editions and platforms",
+      "empty_editor": "Other editions appear here when this product has products in its Other editions metafield (custom.other_editions)."
     }
   },
   "cart": {
@@ -218,6 +261,9 @@
     },
     "logo_list": {
       "empty": "Add logo blocks to this section."
+    },
+    "release_calendar": {
+      "empty": "No upcoming releases right now. Check back soon."
     }
   },
   "blog": {

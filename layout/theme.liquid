@@ -13,6 +13,9 @@
 
     {{ content_for_header }}
 
+    {%- capture platform_selected_template -%}
+      {{- 'general.platform.selected' | t: platform: '__PLATFORM__' -}}
+    {%- endcapture -%}
     <script>
       window.theme = {
         cartType: {{ settings.cart_type | json }},
@@ -27,10 +30,21 @@
         },
         strings: {
           added_to_cart: {{ 'products.product.added_to_cart' | t | json }},
-          cart_error: {{ 'cart.general.error' | t | json }}
+          cart_error: {{ 'cart.general.error' | t | json }},
+          platform_selected: {{ platform_selected_template | json }},
+          platform_cleared: {{ 'general.platform.cleared' | t | json }}
         }
       };
     </script>
+    {%- if settings.enable_my_platform -%}
+      <script>
+        try {
+          var gsPlatform = localStorage.getItem('gs-platform');
+          if (gsPlatform) document.documentElement.setAttribute('data-my-platform', gsPlatform);
+        } catch (error) {}
+      </script>
+      <script src="{{ 'platform.js' | asset_url }}" defer></script>
+    {%- endif -%}
     <script src="{{ 'global.js' | asset_url }}" defer></script>
   </head>
 
