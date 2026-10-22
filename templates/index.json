@@ -12,62 +12,89 @@
     "slideshow": {
       "type": "slideshow",
       "blocks": {
-        "slide-1": {
+        "slide_kWVm97": {
           "type": "slide",
           "settings": {
-            "heading": "New releases are here",
+            "image": "shopify://shop_images/final-fantasy-vii-remake-8k-2020-95-1920x1080.jpg",
+            "heading": "Slide heading",
             "subtext": "Pre-order the games you have been waiting for",
-            "button_label": "Shop now",
+            "button_label": "Buy Now",
+            "button_link": "shopify://products/test-kingdom-embers",
             "text_alignment": "left",
             "overlay_opacity": 55
           }
         }
       },
       "block_order": [
-        "slide-1"
+        "slide_kWVm97"
       ],
       "settings": {
         "height": "medium",
+        "accessibility_label": "",
         "autoplay": false,
-        "autoplay_speed": 6
+        "autoplay_speed": 5
       }
     },
-    "collection_tiles": {
+    "newsletter_q9qRew": {
+      "type": "newsletter",
+      "name": "t:sections.newsletter.presets.name",
+      "settings": {
+        "heading": "Join our newsletter!",
+        "text": "Be the first to know about new releases, discounts and more.",
+        "padding_top": 32,
+        "padding_bottom": 32
+      }
+    },
+    "collection_tiles_LbjbNe": {
       "type": "collection-tiles",
       "blocks": {
-        "tile-1": {
+        "tile_EWV4Bd": {
           "type": "tile",
-          "settings": {}
+          "settings": {
+            "collection": "playstation",
+            "heading": ""
+          }
         },
-        "tile-2": {
+        "tile_ixLkzx": {
           "type": "tile",
-          "settings": {}
+          "settings": {
+            "collection": "xbox",
+            "heading": ""
+          }
         },
-        "tile-3": {
+        "tile_Ly6FRq": {
           "type": "tile",
-          "settings": {}
+          "settings": {
+            "collection": "nintendo",
+            "heading": ""
+          }
         },
-        "tile-4": {
+        "tile_rtweFH": {
           "type": "tile",
-          "settings": {}
+          "settings": {
+            "collection": "pc-gaming",
+            "heading": ""
+          }
         }
       },
       "block_order": [
-        "tile-1",
-        "tile-2",
-        "tile-3",
-        "tile-4"
+        "tile_EWV4Bd",
+        "tile_ixLkzx",
+        "tile_Ly6FRq",
+        "tile_rtweFH"
       ],
+      "name": "t:sections.collection_tiles.presets.name",
       "settings": {
         "padding_top": 32,
         "padding_bottom": 32
       }
     },
-    "latest_releases": {
+    "featured_collection_UhxjTK": {
       "type": "featured-collection",
+      "name": "t:sections.featured_collection.presets.name",
       "settings": {
-        "heading": "Latest releases",
-        "collection": "all",
+        "heading": "Featured products",
+        "collection": "playstation",
         "products_to_show": 8,
         "columns_desktop": 4,
         "show_view_all": true,
@@ -75,79 +102,122 @@
         "padding_bottom": 32
       }
     },
-    "featured_product": {
+    "featured_product_WignEF": {
       "type": "featured-product",
       "blocks": {
-        "title": {
+        "platform_4ykG34": {
+          "type": "platform",
+          "settings": {}
+        },
+        "title_wh6ziC": {
           "type": "title",
           "settings": {}
         },
-        "price": {
+        "price_pJ8EHq": {
           "type": "price",
-          "settings": {}
+          "settings": {
+            "show_tax_note": true
+          }
         },
-        "variant_picker": {
+        "description_LMk6Tx": {
+          "type": "description",
+          "settings": {
+            "truncate_words": 30
+          }
+        },
+        "variant_picker_bQ7WAH": {
           "type": "variant_picker",
-          "settings": {}
+          "settings": {
+            "picker_type": "buttons"
+          }
         },
-        "buy_buttons": {
+        "buy_buttons_J86pXP": {
           "type": "buy_buttons",
-          "settings": {}
+          "settings": {
+            "show_quantity": true,
+            "show_payment_button": true,
+            "show_installments": true,
+            "show_pickup": false
+          }
         }
       },
       "block_order": [
-        "title",
-        "price",
-        "variant_picker",
-        "buy_buttons"
+        "platform_4ykG34",
+        "title_wh6ziC",
+        "price_pJ8EHq",
+        "description_LMk6Tx",
+        "variant_picker_bQ7WAH",
+        "buy_buttons_J86pXP"
       ],
+      "name": "t:sections.featured_product.presets.name",
       "settings": {
+        "product": "test-nvme-ssd",
+        "media_position": "start",
+        "media_ratio": "landscape",
+        "thumbnail_position": "bottom",
         "padding_top": 32,
         "padding_bottom": 32
       }
     },
-    "popular_categories": {
+    "collection_icons_AppmdV": {
       "type": "collection-icons",
       "blocks": {
-        "category-1": {
+        "category_jpfqg9": {
           "type": "category",
-          "settings": {}
+          "settings": {
+            "collection": "playstation",
+            "label": ""
+          }
         },
-        "category-2": {
+        "category_iHP4i4": {
           "type": "category",
-          "settings": {}
+          "settings": {
+            "collection": "xbox",
+            "label": ""
+          }
         },
-        "category-3": {
+        "category_4cF4aL": {
           "type": "category",
-          "settings": {}
+          "settings": {
+            "collection": "nintendo",
+            "label": ""
+          }
         },
-        "category-4": {
+        "category_3rgUce": {
           "type": "category",
-          "settings": {}
+          "settings": {
+            "collection": "pc-gaming",
+            "label": ""
+          }
         },
-        "category-5": {
+        "category_4j6YVm": {
           "type": "category",
-          "settings": {}
+          "settings": {
+            "collection": "playstation",
+            "label": ""
+          }
         }
       },
       "block_order": [
-        "category-1",
-        "category-2",
-        "category-3",
-        "category-4",
-        "category-5"
+        "category_jpfqg9",
+        "category_iHP4i4",
+        "category_4cF4aL",
+        "category_3rgUce",
+        "category_4j6YVm"
       ],
+      "name": "t:sections.collection_icons.presets.name",
       "settings": {
         "heading": "Popular categories",
         "padding_top": 32,
         "padding_bottom": 32
       }
     },
-    "best_sellers": {
+    "featured_collection_PkBkzX": {
       "type": "featured-collection",
+      "name": "t:sections.featured_collection.presets.name",
       "settings": {
-        "heading": "Best sellers",
-        "collection": "all",
+        "heading": "Featured products",
+        "collection": "pc-gaming",
         "products_to_show": 8,
         "columns_desktop": 4,
         "show_view_all": true,
@@ -155,43 +225,49 @@
         "padding_bottom": 32
       }
     },
-    "news": {
-      "type": "blog-posts",
-      "settings": {
-        "heading": "GameShop News",
-        "post_limit": 3,
-        "show_date": true,
-        "show_excerpt": true,
-        "padding_top": 32,
-        "padding_bottom": 32
-      }
-    },
-    "brand_partners": {
+    "logo_list_Ng6tEN": {
       "type": "logo-list",
       "blocks": {
-        "logo-1": {
+        "logo_dK6ybi": {
           "type": "logo",
-          "settings": {}
+          "settings": {
+            "image": "shopify://shop_images/ps-logo.png",
+            "name": "Sony",
+            "link": ""
+          }
         },
-        "logo-2": {
+        "logo_NAhnXV": {
           "type": "logo",
-          "settings": {}
+          "settings": {
+            "image": "shopify://shop_images/ps-logo.png",
+            "name": "XBox",
+            "link": ""
+          }
         },
-        "logo-3": {
+        "logo_nzQ3jE": {
           "type": "logo",
-          "settings": {}
+          "settings": {
+            "image": "shopify://shop_images/ps-logo.png",
+            "name": "Nintendo",
+            "link": ""
+          }
         },
-        "logo-4": {
+        "logo_qiARkb": {
           "type": "logo",
-          "settings": {}
+          "settings": {
+            "image": "shopify://shop_images/ps-logo.png",
+            "name": "PC Gaming",
+            "link": ""
+          }
         }
       },
       "block_order": [
-        "logo-1",
-        "logo-2",
-        "logo-3",
-        "logo-4"
+        "logo_dK6ybi",
+        "logo_NAhnXV",
+        "logo_nzQ3jE",
+        "logo_qiARkb"
       ],
+      "name": "t:sections.logo_list.presets.name",
       "settings": {
         "heading": "Brand partners",
         "logo_width": 140,
@@ -202,12 +278,12 @@
   },
   "order": [
     "slideshow",
-    "collection_tiles",
-    "latest_releases",
-    "featured_product",
-    "popular_categories",
-    "best_sellers",
-    "news",
-    "brand_partners"
+    "newsletter_q9qRew",
+    "collection_tiles_LbjbNe",
+    "featured_collection_UhxjTK",
+    "featured_product_WignEF",
+    "collection_icons_AppmdV",
+    "featured_collection_PkBkzX",
+    "logo_list_Ng6tEN"
   ]
 }

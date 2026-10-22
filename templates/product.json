@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "main": {
@@ -21,7 +30,10 @@
             "show_pickup": true
           }
         },
-        "share": { "type": "share" },
+        "share": {
+          "type": "share",
+          "settings": {}
+        },
         "shipping": {
           "type": "collapsible_tab",
           "settings": {
@@ -29,7 +41,12 @@
             "content": "<p>Add delivery times and return policy details here so shoppers know what to expect before they buy.</p>"
           }
         },
-        "specifications": { "type": "specifications", "settings": { "label": "Specifications" } }
+        "specifications": {
+          "type": "specifications",
+          "settings": {
+            "label": "Specifications"
+          }
+        }
       },
       "block_order": [
         "platform",
