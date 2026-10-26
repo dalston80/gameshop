@@ -70,6 +70,7 @@
           "settings": {
             "collection": "nintendo",
             "heading": "",
+            "image": "shopify://shop_images/nin-bg.avif",
             "platform": ""
           }
         },
