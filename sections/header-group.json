@@ -36,7 +36,7 @@
         "promo_link": "",
         "customer_account_menu": "",
         "show_localization": true,
-        "sticky": true
+        "sticky": false
       }
     }
   },
