@@ -52,28 +52,33 @@
           "type": "tile",
           "settings": {
             "collection": "playstation",
-            "heading": ""
+            "heading": "",
+            "platform": ""
           }
         },
         "tile_ixLkzx": {
           "type": "tile",
           "settings": {
             "collection": "xbox",
-            "heading": ""
+            "heading": "",
+            "image": "shopify://shop_images/xsx-1200-80.jpg",
+            "platform": ""
           }
         },
         "tile_Ly6FRq": {
           "type": "tile",
           "settings": {
             "collection": "nintendo",
-            "heading": ""
+            "heading": "",
+            "platform": ""
           }
         },
         "tile_rtweFH": {
           "type": "tile",
           "settings": {
             "collection": "pc-gaming",
-            "heading": ""
+            "heading": "",
+            "platform": ""
           }
         }
       },
