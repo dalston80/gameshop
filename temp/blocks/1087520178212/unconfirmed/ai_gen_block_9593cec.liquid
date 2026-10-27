@@ -1,6 +1,185 @@
+{% doc %}
+  @prompt
+    Create a collection tiles block matching the existing collection tiles layout, with independently editable tiles. Each tile must have its own color overlay option using a color picker, plus an adjustable overlay opacity and a way to turn the overlay off. Preserve support for each tile's editable image, collection link, and title. Place the color overlay over the image but behind the text so labels remain readable. Initial platform overlay colors should match the theme's existing badge palette where available: PlayStation blue, Xbox green, Nintendo red, and PC yellow. Do not lock colors to platforms: merchants must be able to choose any color separately for every tile.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-collection-tiles-{{ ai_gen_id }} {
+    display: block;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+  }
+
+  .ai-collection-tiles__grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat({{ block.settings.columns_desktop }}, minmax(0, 1fr));
+    gap: {{ block.settings.tile_gap }}px;
+    width: 100%;
+  }
+
+  .ai-collection-tiles__tile-{{ ai_gen_id }} {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: {{ block.settings.tile_height }}px;
+    overflow: hidden;
+    border-radius: {{ block.settings.corner_radius }}px;
+    background: #eef2f2;
+    color: #ffffff;
+    text-decoration: none;
+    isolation: isolate;
+  }
+
+  .ai-collection-tiles__image-{{ ai_gen_id }},
+  .ai-collection-tiles__placeholder-{{ ai_gen_id }} {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ai-collection-tiles__image-{{ ai_gen_id }} { object-fit: cover; }
+
+  .ai-collection-tiles__placeholder-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eef2f2;
+  }
+
+  .ai-collection-tiles__placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 220px;
+    max-height: 220px;
+    color: #68777a;
+  }
+
+  .ai-collection-tiles__overlay-{{ ai_gen_id }} {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--tile-overlay-color);
+    opacity: var(--tile-overlay-opacity);
+    pointer-events: none;
+  }
+
+  .ai-collection-tiles__title-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 20px 18px;
+    color: #ffffff;
+    font-size: {{ block.settings.title_size }}px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    overflow-wrap: anywhere;
+  }
+
+  .ai-collection-tiles__tile-{{ ai_gen_id }}:focus-visible {
+    outline: 3px solid {{ block.settings.focus_color }};
+    outline-offset: 3px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-collection-tiles__grid-{{ ai_gen_id }} {
+      grid-template-columns: repeat({{ block.settings.columns_mobile }}, minmax(0, 1fr));
+    }
+
+    .ai-collection-tiles__tile-{{ ai_gen_id }} { min-height: {{ block.settings.tile_height_mobile }}px; }
+  }
+{% endstyle %}
+
+<div class="ai-collection-tiles-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-collection-tiles__grid-{{ ai_gen_id }}">
+    {% for i in (1..4) %}
+      {% liquid
+        assign image_key = 'tile_' | append: i | append: '_image'
+        assign collection_key = 'tile_' | append: i | append: '_collection'
+        assign title_key = 'tile_' | append: i | append: '_title'
+        assign overlay_enabled_key = 'tile_' | append: i | append: '_overlay_enabled'
+        assign overlay_color_key = 'tile_' | append: i | append: '_overlay_color'
+        assign tile_image = block.settings[image_key]
+        assign tile_collection = block.settings[collection_key]
+        assign tile_title = block.settings[title_key]
+        assign overlay_enabled = block.settings[overlay_enabled_key]
+        assign overlay_color = block.settings[overlay_color_key]
+        assign opacity_key = 'tile_' | append: i | append: '_overlay_opacity'
+        assign overlay_opacity = block.settings[opacity_key] | divided_by: 100.0
+        if tile_image == blank and tile_collection != blank
+          assign tile_image = tile_collection.featured_image
+        endif
+        assign tile_url = tile_collection.url
+        if tile_url == blank
+          assign tile_url = routes.all_products_collection_url
+        endif
+        if tile_title == blank and tile_collection != blank
+          assign tile_title = tile_collection.title
+        endif
+      %}
+      <a class="ai-collection-tiles__tile-{{ ai_gen_id }}" href="{{ tile_url }}" aria-label="{{ tile_title | default: 'Browse collection' | escape }}">
+        {% if tile_image != blank %}
+          <img class="ai-collection-tiles__image-{{ ai_gen_id }}" src="{{ tile_image | image_url: width: 1200 }}" alt="{{ tile_image.alt | default: tile_title | escape }}" loading="lazy" width="{{ tile_image.width }}" height="{{ tile_image.height }}">
+        {% else %}
+          <div class="ai-collection-tiles__placeholder-{{ ai_gen_id }}">{{ 'collection-apparel-1' | placeholder_svg_tag }}</div>
+        {% endif %}
+        {% if overlay_enabled %}
+          <span class="ai-collection-tiles__overlay-{{ ai_gen_id }}" style="--tile-overlay-color: {{ overlay_color }}; --tile-overlay-opacity: {{ overlay_opacity }};"></span>
+        {% endif %}
+        <span class="ai-collection-tiles__title-{{ ai_gen_id }}">{{ tile_title | default: 'Choose a collection' | escape }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Collection tiles",
+  "settings": [
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "desktop_width_percent", "label": "Desktop width", "min": 50, "max": 100, "step": 5, "unit": "%", "default": 100 },
+    { "type": "select", "id": "columns_desktop", "label": "Columns on desktop", "options": [{ "value": "2", "label": "2" }, { "value": "3", "label": "3" }, { "value": "4", "label": "4" }], "default": "4" },
+    { "type": "select", "id": "columns_mobile", "label": "Columns on mobile", "options": [{ "value": "1", "label": "1" }, { "value": "2", "label": "2" }], "default": "2" },
+    { "type": "range", "id": "tile_gap", "label": "Tile gap", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 16 },
+    { "type": "range", "id": "tile_height", "label": "Tile height", "min": 120, "max": 480, "step": 20, "unit": "px", "default": 240 },
+    { "type": "range", "id": "tile_height_mobile", "label": "Mobile tile height", "min": 100, "max": 360, "step": 20, "unit": "px", "default": 180 },
+    { "type": "range", "id": "title_size", "label": "Title size", "min": 16, "max": 40, "step": 2, "unit": "px", "default": 24 },
+    { "type": "range", "id": "corner_radius", "label": "Corner radius", "min": 0, "max": 20, "step": 2, "unit": "px", "default": 4 },
+    { "type": "color", "id": "focus_color", "label": "Focus outline", "default": "#087287" },
+    { "type": "header", "content": "Tile 1" },
+    { "type": "image_picker", "id": "tile_1_image", "label": "Image" },
+    { "type": "collection", "id": "tile_1_collection", "label": "Collection" },
+    { "type": "text", "id": "tile_1_title", "label": "Title", "default": "PlayStation" },
+    { "type": "checkbox", "id": "tile_1_overlay_enabled", "label": "Show color overlay", "default": true },
+    { "type": "color", "id": "tile_1_overlay_color", "label": "Overlay color", "default": "#0A3FB5" },
+    { "type": "range", "id": "tile_1_overlay_opacity", "label": "Overlay opacity", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 35 },
+    { "type": "header", "content": "Tile 2" },
+    { "type": "image_picker", "id": "tile_2_image", "label": "Image" },
+    { "type": "collection", "id": "tile_2_collection", "label": "Collection" },
+    { "type": "text", "id": "tile_2_title", "label": "Title", "default": "Xbox" },
+    { "type": "checkbox", "id": "tile_2_overlay_enabled", "label": "Show color overlay", "default": true },
+    { "type": "color", "id": "tile_2_overlay_color", "label": "Overlay color", "default": "#107C10" },
+    { "type": "range", "id": "tile_2_overlay_opacity", "label": "Overlay opacity", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 35 },
+    { "type": "header", "content": "Tile 3" },
+    { "type": "image_picker", "id": "tile_3_image", "label": "Image" },
+    { "type": "collection", "id": "tile_3_collection", "label": "Collection" },
+    { "type": "text", "id": "tile_3_title", "label": "Title", "default": "Nintendo" },
+    { "type": "checkbox", "id": "tile_3_overlay_enabled", "label": "Show color overlay", "default": true },
+    { "type": "color", "id": "tile_3_overlay_color", "label": "Overlay color", "default": "#C4001A" },
+    { "type": "range", "id": "tile_3_overlay_opacity", "label": "Overlay opacity", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 35 },
+    { "type": "header", "content": "Tile 4" },
+    { "type": "image_picker", "id": "tile_4_image", "label": "Image" },
+    { "type": "collection", "id": "tile_4_collection", "label": "Collection" },
+    { "type": "text", "id": "tile_4_title", "label": "Title", "default": "PC" },
+    { "type": "checkbox", "id": "tile_4_overlay_enabled", "label": "Show color overlay", "default": true },
+    { "type": "color", "id": "tile_4_overlay_color", "label": "Overlay color", "default": "#F5B800" },
+    { "type": "range", "id": "tile_4_overlay_opacity", "label": "Overlay opacity", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 35 }
+  ],
+  "presets": [{ "name": "Collection tiles" }],
+  "tag": null,
+  "class": "collection-tiles-block"
+}
 {% endschema %}
